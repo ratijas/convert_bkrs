@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>Ukraine</string>
+	<key>CFBundleDisplayName</key>
+	<string>大БРуКС</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.ratijas.dictionary.bruks</string>
+	<key>CFBundleName</key>
+	<string>大БРуКС</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.60</string>
+	<key>DCSDictionaryCopyright</key>
+	<string>Копилефт (англ. copyleft) (Ɔ) 2014 Ratijas &amp; Mac-J studio</string>
+	<key>DCSDictionaryManufacturerName</key>
+	<string>Ratijas &amp; Mac-J studio</string>
+	<key>DCSDictionaryFrontMatterReferenceID</key>
+	<string>front_back_matter</string>
+	<key>DCSDictionaryPrefsHTML</key>
+	<string>bruks_prefs.html</string>
+	<key>DCSDictionaryXSL</key>
+	<string>bruks.xsl</string>
+	<key>DCSDictionaryDefaultPrefs</key>
+	<dict>
+		<key>pronunciation</key>
+		<string>0</string>
+		<key>display-column</key>
+		<string>1</string>
+		<key>display-picture</key>
+		<string>1</string>
+		<key>version</key>
+		<string>1</string>
+	</dict>
+</dict>
+</plist>
