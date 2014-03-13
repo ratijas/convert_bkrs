@@ -70,11 +70,11 @@ def search_for_pin_yin_in_string( s ):
 	result = []
 
 	diactris_table = (
-		( u'([āáǎăà])',		u'a' ),
-		( u'([ēéěè])',		u'e' ),
-		( u'([ōóǒò])',		u'o' ),
-		( u'([ūúǔùǖǘǚǜ])',	u'u' ),
-		( u'([īíǐì])',		u'i' )
+		( u'[āáǎăà]',		u'a' ),
+		( u'[ēéěè]',		u'e' ),
+		( u'[ōóǒò]',		u'o' ),
+		( u'[ūúǔùǖǘǚǜ]',	u'u' ),
+		( u'[īíǐì]',		u'i' )
 	)
 	
 	if not isinstance( s, unicode ):
