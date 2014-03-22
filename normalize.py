@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
-'''
+u'''
 модуль normalize
 
 удалить пробелы в начале, в конце, а также заменить смежные пробелы на один
 '''
 
 import re
+from rm_unicode import u, utf
 
 try:
 	from unidecode import unidecode
@@ -18,69 +19,77 @@ https://pypi.python.org/packages/source/U/Unidecode/Unidecode-0.04.14.tar.gz
 '''
 	exit(1)
 
-# глобальная переменная, только для ф-ции spaces
-_space_re = re.compile( '( |\t){2,}' )
 
-def spaces( s ):
-	'''
-	обрезать пробелы внале и вконце, заменить повторяющиеся пробелы и табуляции на один пробел
-	'''
-	return re.sub( _space_re, ' ', s.strip())
+def spaces():
+	# глобальная переменная, только для ф-ции spaces
+	space_re = re.compile( ur'( |\t){2,}', re.UNICODE )
 
+	def spaces( s ):
+		'''
+		обрезать пробелы внале и вконце, заменить повторяющиеся пробелы и табуляции на один пробел
+		'''
+		return utf( re.sub( space_re, u' ', u( s ).strip() ))
+	return spaces
+spaces = spaces()
 
-_re_sub = (
-	(
-		re.compile( r'( *)\{( *)\\\[( *)' ),		# { \[
-		r'\1\2\3['
-	),
-	(
-		re.compile( r'( *)\\\]( *)\}( *)' ),		# \] }
-		r']\1\2\3'
-	),
-	(
-		re.compile( r'( *)\{( *)\(( *)\}( *)' ),	# { ( }
-		r'\1\2\3\4['
-	),
-	(
-		re.compile( r'( *)\{( *)\)( *)\}( *)' ),	# { ) }
-		r']\1\2\3\4' 
-	),
-	(
-		re.compile( r'( *)\{( *)\(( *)' ),			# { (
-		r'\1\2\3['
-	),
-	(
-		re.compile( r'( *)\)( *)\}( *)' ),			# ) }
-		r']\1\2\3'
-	),
-	(
-		re.compile( r'( *)\{( *)' ),				# {
-		r'\1\2['
-	),
-	(
-		re.compile( r'( *)\}( *)' ),				# }
-		r']\1\2'
-	),
-	(
-		re.compile( r'{.*?}' ),
-		r''
+def brackets():
+	re_sub = (
+		(
+			re.compile( ur'( *)\{( *)\\\[( *)', re.UNICODE ),		# { \[
+			ur'\1\2\3['
+		),
+		(
+			re.compile( ur'( *)\\\]( *)\}( *)', re.UNICODE ),		# \] }
+			ur']\1\2\3'
+		),
+		(
+			re.compile( ur'( *)\{( *)\(( *)\}( *)', re.UNICODE ),	# { ( }
+			ur'\1\2\3\4['
+		),
+		(
+			re.compile( ur'( *)\{( *)\)( *)\}( *)', re.UNICODE ),	# { ) }
+			ur']\1\2\3\4' 
+		),
+		(
+			re.compile( ur'( *)\{( *)\(( *)', re.UNICODE ),			# { (
+			ur'\1\2\3['
+		),
+		(
+			re.compile( ur'( *)\)( *)\}( *)', re.UNICODE ),			# ) }
+			ur']\1\2\3'
+		),
+		(
+			re.compile( ur'( *)\{( *)', re.UNICODE ),				# {
+			ur'\1\2['
+		),
+		(
+			re.compile( ur'( *)\}( *)', re.UNICODE ),				# }
+			ur']\1\2'
+		),
+		(
+			re.compile( ur'{.*?}', re.UNICODE ),
+			ur''
+		)
 	)
-)
 
-def brackets( s ):
-	'''
-	замена всех вариантов скобок на квадратные []
+	def brackets( s ):
+		r'''
+		замена всех вариантов скобок на квадратные []
 
-	заменяются такие комбинации:
-		{ \[ ... \] }
-		{ ( } ... { ) }
-		{ ( ... ) }
-		{ ... }
-	'''
-	if s.find( '{' ) is not -1:		# -1 значит не найденно
-		for exp, sub in _re_sub:
-			s = re.sub( exp, sub, s )
-	return spaces( s )
+		заменяются такие комбинации:
+			{ \[ ... \] }
+			{ ( } ... { ) }
+			{ ( ... ) }
+			{ ... }
+		'''
+		s = u( s )
+		if s.find( u'{' ) is not -1:		# -1 значит не найденно
+			for exp, sub in re_sub:
+				s = re.sub( exp, sub, s )
+		return utf( spaces( s ))
+	return brackets
+brackets = brackets()
+
 
 def full( s ):
 	'''
@@ -88,45 +97,53 @@ def full( s ):
 
 	длинный вариант строки с квадратными скобками
 	'''
-	return s.replace( '[', '' ).replace( ']', '' )
+	return utf( u( s ).replace( '[', '' ).replace( ']', '' ))
 
 
-_del_brackets_re = re.compile( r'\[.*?\]' )
+def short():
+	del_brackets_re = re.compile( ur'\[.*?\]', re.UNICODE )
 
-def short( s ):
-	'''
-	short( 'seq[uence]' ) -> 'seq'
+	def short( s ):
+		'''
+		short( 'seq[uence]' ) -> 'seq'
 
-	короткий вариант строки с квадратными скобками
-	'''
-	return spaces( re.sub( _del_brackets_re, '', s ))
+		короткий вариант строки с квадратными скобками
+		'''
+		return utf( spaces( re.sub( del_brackets_re, u'', u( s ))))
+	return short
+short = short()
 
-_non_id_re = re.compile( r'[^a-zA-Z0-9_]' )
+def id():
+	non_id_re = re.compile( r'[^a-zA-Z0-9_]' )
 
-def id( s ):
-	s = unicode( s, 'UTF-8' )
-	s = unidecode( s )
-	s = s.strip()
-	s = full( brackets( s ))
-	s = s.lower()
-	s = spaces( s ).replace( ' ', '_' )
-	s = re.sub( _non_id_re, '_', s )
-
-	return s
-
+	def id( s ):
+		s = u( s )
+		s = unidecode( s )
+		s = u( s )
+		s = s.strip()
+		s = brackets( s )
+		s = full( s )
+		s = s.lower()
+		s = spaces( s )
+		s = s.replace( ' ', '_' )
+		s = re.sub( non_id_re, '_', s )
+		s = utf( s )
+		return s
+	return id
+id = id()
 
 if __name__ == '__main__':
-	s = ' попытка 	{(}to{)}   test  这个 '
-	print s, 'id()', id( s )
+	s = u' попытка 	{(}to{)}   test  这个 '
+	print s, '\t\t id() \t\t', id( s )
 
-	r = r'{(}высоко{)} поднять знамя чего-либо'
-	print r, 'brackets()', brackets( r )
+	r = ur'{(}высоко{)} поднять знамя чего-либо'
+	print r, '\t\t brackets() \t\t', brackets( r )
 
-	t = r'в {(}самый {)}разгар'
-	print t, 'full()', full( brackets( t ))
+	t = ur'в {(}самый {)}разгар'
+	print t, '\t\t full() \t\t', full( brackets( t ))
 
-	h = r'по{ чьему-либо} адресу'
-	print h, 'short()', short( brackets( h ))
+	h = ur'по{ чьему-либо} адресу'
+	print h, '\t\t short() \t\t', short( brackets( h ))
 
-	d = r'быть {\[находиться, содержаться\] }под стражей'
-	print d, 'brackets()', brackets( d )
+	d = ur'быть {\[находиться, содержаться\] }под стражей'
+	print d, '\t\t brackets() \t\t', brackets( d )

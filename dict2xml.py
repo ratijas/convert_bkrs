@@ -8,11 +8,12 @@
 
 from rm_xml import *
 import normalize
+import index
 import re
 import sys		# sys.stderr
 
 stack = []
-'стек вложеных тегов по мере разбора строка bb-кода'
+'''стек вложеных тегов по мере разбора строка bb-кода'''
 
 def dictionary_open():
 	'''
@@ -26,37 +27,53 @@ def dictionary_close():
 	'''
 	return '\n</d:dictionary>'
 
-id_set = set()
-'идентификатор не должен регистрироваться дважды'
+class IDError( ValueError ):
+	def __init__(self, arg):
+		super(IDError, self).__init__()
+		self.arg = arg
 
-def make_id( s, only_get=False ):
-	'''
-	создать идентификатор и проследить, чтобы он не повторялся
-	'''
-	id = normalize.id( s )
+	def __str__( self ):
+		return self.arg
+		
 
-	if not check_id( id ):
-		raise Exception( 'make_id: невозможно создать валидный id (%s)' % id )
+def make_id():
+	ids = set()
+	'идентификатор не должен регистрироваться дважды'
 
-	if not only_get:
-		h = hash( id )
-		if h in id_set:
-			raise Exception( 'make_id: идентификатор "%s" уже зарегистрирован' % id )
-		id_set.add( h )
-	return id
+	def make_id( s, only_get=False ):
+		'''
+		создать идентификатор и проследить, чтобы он не повторялся
+		'''
+		id = '_%s_%d' % ( normalize.id( s ), len( ids ))
 
-def entry( title ):
+		if not check_id( id ):
+			raise IDError( 'make_id: невозможно создать валидный id (%s)' % id )
+
+		if not only_get:
+			h = hash( id )
+			if h in ids:
+				raise IDError( 'make_id: уже было: "%s"' % id )
+			ids.add( h )
+		return id
+	return make_id
+make_id = make_id()
+
+def entry( title, reading=None ):
 	id = make_id( title )
-	full = normalize.full( normalize.brackets( title ))
+	full = normalize.brackets( title )
+	full = normalize.full( full )
 
 	en = xml_node( 'd', 'entry', attr=(
 		xml_attr( '', 'id', id ),
 		xml_attr( 'd', 'title', full )
 	))
 
-	en.add_child( *index( title ))
+	en.add_child( *gen_indexes( title, reading ))
 
-	en.add_child( header( full ))
+	h = xml_node( name='span', attr=( xml_attr( name='class', value='ch' ), ))
+	h.add_child( *content( full ) )
+
+	en.add_child( h )
 
 	return en
 
@@ -66,58 +83,58 @@ def _index( value, title=None ):
 	'''
 	if title is None:
 		title = value
-	return xml_node( 'd', 'index', True, attr=(
-		xml_attr( 'd', 'value', value ),
-		xml_attr( 'd', 'title', title )
+	return xml_node( u'd', u'index', True, attr=(
+		xml_attr( u'd', u'value', value ),
+		xml_attr( u'd', u'title', title )
 		)
 	)
 
-def index( s ):
+def gen_indexes( s, reading=None ):
 	'''
-	index( title ) -> list
+	gen_indexes( title ) -> list
 
 	создать индексы для всех возможных вариантов
 	возвращает список из xml_node
 	'''
-	indexes = []
-
-	s = normalize.brackets( s )
-	if s.find( '[' ) is not -1:
-		full = normalize.full( s )
-		short = normalize.short( s )
-		
-		indexes.append( _index( value=full ))
-		indexes.append( _index( value=short, title=full ))
-	else:
-		indexes.append( _index( value=s ))
-	return indexes
+	idx, full = index.indexes( s, reading )		# комбинации
+	return [ _index( i, full ) for i in idx ]	# оформение в xml
 
 
 def generate_el( name ):
+	name = utf( name )
 	if name[0] == 'm':
 		if len( name ) == 2:
-			return paragraph( int( name[1] ))
+			depth = int( name[ 1 ])
+			if not 0 <= depth <= 9:
+				raise Exception( 'paragraph: слишком большой уровень (%d)' % level )
 		else:
-			return paragraph()
-	elif name == 'p' or name == 'c':
-		return mark()
+			depth = 0
+		v = 'm%d' % depth
+		return xml_node( name='span', attr=( xml_attr( name='class', value=v ), ))
+	elif name == 'p':
+		return xml_node( name='span', attr=( xml_attr( name='class', value='p' ), ))
+	elif name == 'c':
+		return xml_node( name='span', attr=( xml_attr( name='class', value='c' ), ))
 	elif name == 'div':
-		return div()
+		return xml_node( name='div' )
 	elif name == 'i':
-		return italic()
+		return xml_node( name='i' )
 	elif name == 'b':
-		return bold()
+		return xml_node( name='b' )
 	elif name == '*':
-		return span()
+		return xml_node( name='span' )
 	elif name == 'ex':
-		return example()
+		return xml_node(
+			name = 'span',
+			attr = (
+				xml_attr( name='class', value='e' ),
+				xml_attr( prefix='d', name='priority', value='2' )
+			)
+		)
 	elif name == 'ref':
-		# end_ptr = s.find( '[' )
-		# if end_ptr == -1:
-		# 	print >>sys.stderr, '<-- generate_el: тег a не закрыт -->'
-		return link( '#' )
+		return xml_node( name='span', attr=( xml_attr( name='class', value='ln' ), ))
 	elif name == 'br':
-		return br()
+		return xml_node( name='br', single=True )
 	elif name in ( 'ol', 'ul', 'li' ):
 		return xml_node( name=name )
 	elif name in ( 'table', 'tr', 'td' ):
@@ -141,15 +158,17 @@ def gettoken( s ):
 		0 -- строка 			'..'
 		1 -- открывающий тег 	'[..]'
 		2 -- закрывающий тег 	'[/..]'
-	value -- значение токена. для тегов скобки и обратные слеши убираются. 'm1', 'ref'
+	value <unicode> -- значение токена. для тегов скобки и обратные слеши убираются. 'm1', 'ref'
 	length -- исходная длинна токена в символах. особенно актуально для тегов
 	'''
 	type = 0
 	value = None
 	length = 0
 
+	s = u( s )
+
 	if s[0] == '[':
-		tag_end_ptr = s.find( ']' )		# конец имени тега, не скобки
+		tag_end_ptr = s.find( u']' )		# конец имени тега, не скобки
 		if tag_end_ptr == -1:
 			raise Exception( 'gettoken: тег не закрыт (%s)' % s )
 
@@ -159,7 +178,7 @@ def gettoken( s ):
 		if space_ptr != -1:				# на случай всяких там [c black]
 			tag_end_ptr = space_ptr
 
-		if s[ 1 ] == '/':
+		if s[ 1 ] == u'/':
 			type 	= token_type_tag_close
 			value 	= s[ 2 : tag_end_ptr ]
 		else:
@@ -167,7 +186,7 @@ def gettoken( s ):
 			value 	= s[ 1 : tag_end_ptr ]
 	else:
 		type 	= token_type_string
-		tag_begin_ptr = s.find( '[' )
+		tag_begin_ptr = s.find( u'[' )
 		if tag_begin_ptr == -1:
 			value = s
 		else:
@@ -179,11 +198,12 @@ def gettoken( s ):
 
 def parse( s ):
 	'''
-	parse( s ) -> list
+	parse( s ) -> list of xml_node
 
 	парсер bb-кода. для разбора bb-кода передать только строку с кодом.
 	возвращает list из xml_node
 	'''
+	s = u( s )
 
 	stack_xml 	= []			# стек xml. последний элемент -- текущая ветка
 	stack_bb 	= []
@@ -200,13 +220,13 @@ def parse( s ):
 			curnode.append( xml_text( tval ))
 
 		elif ttype == token_type_tag_open:
-			if tval.startswith( 'm' ):
-				tval = 'm'			# тег абзаца m1..m9 закрывается тегом [/m]
+			if tval.startswith( u'm' ):
+				tval = u'm'			# тег абзаца m1..m9 закрывается тегом [/m]
 			el = generate_el( tval )
 			curnode.append( el )
 			
-			if tval == 'ref':
-				curnode.append( br())
+			if tval == u'ref':
+				curnode.append( xml_node( name='br', single=True ))
 
 			if not el.single:
 				stack_bb.append( tval )
@@ -214,36 +234,58 @@ def parse( s ):
 				curnode = el
 
 		elif ttype == token_type_tag_close:
-			if len( stack_bb ) > 0 and ( stack_bb[ -1 ] in ( tval, 'c' )): # часто глюки на [c]
-				stack_bb.pop()
+			while len( stack_bb ) > 0:
+				last = stack_bb.pop()
 				stack_xml.pop()
+				if last is tval:
+					break
 
-				if len( stack_xml ) > 0:
-					curnode = stack_xml[ -1 ]
-				else:
-					curnode = result
+			if len( stack_xml ) > 0:
+				curnode = stack_xml[ -1 ]
+			else:
+				curnode = result
 		ptr += tlen
 
 	return result
 
 
-_digits_and_bracket_re = re.compile( r'(\D)(([2-9]|\d{2})\))' )
 
-def content( s ):
+def content():
+	# приватная переменная
+	digits_and_bracket_re = re.compile( ur'(\D)(([2-9]|\d{2})\))' )
+
+	def content( s ):
+		'''
+		content ( s ) -> list of xml_node
+
+		отформатировать bb-код в xhtml
+		возвращает список из xml_node
+		'''
+		s = u( s )
+		# &#91;     Left square bracket
+		# &#93;     Right square bracket
+
+		s = s.replace( r'\[', r'&#91;' ).replace( r'\]', r'&#93;' )		# обезопасить нарочно \[эскейпнутые\] квадратные скобки
+		s = s.replace( r'<',  r'&#60;' ).replace( r'>',  r'&#62;' )		# убрать <треугольные скобки>
+		s = re.sub( digits_and_bracket_re, r'\1[br]\2', s )			# переносы строк перед пунктами списка
+
+		return parse( s )
+	return content
+content = content()
+
+
+def pin_yin( s ):
 	'''
-	content ( s ) -> list
+	pin_yin( s ) -> xml_node 'span'
 
-	отформатировать bb-код в xhtml
-	возвращает список из xml_node
+	обёртка для пиньиня
 	'''
-	# &#91;     Left square bracket
-	# &#93;     Right square bracket
+	s = content( u( s ))
 
-	s = s.replace( r'\[', r'&#91;' ).replace( r'\]', r'&#93;' )		# обезопасить нарочно \[эскейпнутые\] квадратные скобки
-	s = s.replace( r'<',  r'&#60;' ).replace( r'>',  r'&#62;' )		# убрать <треугольные скобки>
-	s = re.sub( _digits_and_bracket_re, r'\1[br]\2', s )			# переносы строк перед пунктами списка
-
-	return parse( s )
+	root = xml_node( name='span' )
+	root.add_attr( xml_attr( name='class', value='py' ))
+	root.add_child( *s )
+	return root
 
 
 def header( s=None ):
@@ -256,77 +298,18 @@ def header( s=None ):
 	return x
 
 
-def paragraph( level=0 ):
-	'''
-	создать из m1 .. m9 параграф текста <p class="m1 .. m9">...</p>
-	'''
-	if 0 <= level <= 9:
-		v = 'm%d' % level
-		return xml_node( name='span', attr=( xml_attr( name='class', value=v ), ))
-	else:
-		raise Exception( 'paragraph: слишком большой уровень (%d)' % level )
+def main():
+	s4 = ur'''[b]I[/b][m1][c][i]союз[/i][/c][/m][m1]1) ([i]при сопоставлении[/i]) 可\[是\] kě\[shì\]; 却\[是\] què\[shì\] [i]([c]тк.[/i][/c] перед [c][i]сказ.[/c])[/i]; 而 ér, 但是 dànshì[/m][m2][*][ex]я просил его прийти, а он не согласился - 我请他来, 他可不要了[/ex][/*][/m][m2][*][ex]преподаватель объяснил ему несколько раз, а он так и не понял - 教员给他说了几次, 他却不明白[/ex][/*][/m][m1]2) [i]([c]в знач.[/c] но, однако[/i]) 可\[是\] kě\[shì\], 但\[是\] dàn\[shì\][/m][m2][*][ex]хотя здесь и очень хорошо, а придётся уходить - 虽然这里很好, 但是非去不可[/ex][/*][/m][m1]3) ([i]при противопоставлении[/i]) 而\[是\] ěr\[shì\][/m][m2][*][ex]он не специалист, а просто дилетант - 他不是专家, 而是一个外行[/ex][/*][/m][m1]4) ([i]служит для усиления[/i]) 可 kě, 倒 dào[/m][m2][*][ex]а я и не знал! - 我可不知道啊![/ex][/*][/m][m2][*][ex]а он так и не согласился - 他倒是不同意了[/ex][/*][/m][b]II[/b][m1][c][i]частица[/i][/c][/m][m1]1) ([i]при обращении[/i]) 啊 ā, 呀 yā[/m][m2][*][ex]мам, а мам! - 妈妈, 妈妈呀![/ex][/*][/m][m1]2) [c][i]вопр.[/i][/c] 呢 ne[/m][m2][*][ex]что ты сегодня делаешь? а завтра? - 你今天作什么? 明天呢?[/ex][/*][/m][b]III[/b][m1][c][i]межд.[/i][/c] 啊 ā, 哎呀 āi-yā[/m]'''
 
+	print u'__main__: s4 = %s' % s4
+	print u'длинна s4 = %d' % len( s4 )
 
+	set_indent( False )
+	for x in content( s4 ):
+		print u'%s' % u ( x ),
+	print
 
-def example():
-	'''
-	создать тег примера <span class="ex">...</span> с приоритетом "1"
-	'''
-	return xml_node(
-		name = 'span',
-		attr = (
-			xml_attr( name='class', value='e' ),
-			xml_attr( prefix='d', name='priority', value='2' )
-		)
-	)
-
-
-def link( ln ):
-	'''
-	создать тег гиперссылки <a href="..."> (на самом деле <span class='ln')
-	'''
-	return xml_node( name='span', attr=( xml_attr( name='class', value='ln' ), ))
-
-
-def italic():
-	'''
-	создать курсивный текст <i>...</i>
-	'''
-	return xml_node( name='i' )
-
-
-def bold():
-	'''
-	создать полужирный текст <b>...</b>
-	'''
-	return xml_node( name='b' )
-
-def span():
-	'''
-	создать чистый span
-	'''
-	return xml_node( name='span' )
-
-def div():
-	'''
-	создать чистый div
-	'''
-	return xml_node( name='div' )
-
-def br():
-	'''
-	создать перенос строки br
-	'''
-	return xml_node( name='br', single=True )
-
-def mark():
-	return xml_node( name='span', attr=( xml_attr( name='class', value='c' ), ))
-
-if __name__ == '__main__':
-
-	s4 = r'[m1]string [i]italic[/i][/m]'
-
-	print '__main__: s4 = %s' % s4
-	print 'длинна s4 = %d' % len( s4 )
-	for x in parse( s4 ):
-		print x
+	print u'pin_yin: %s' % u( str( pin_yin( 'shāndōng' )))
+	
+if __name__ == u'__main__':
+	main()

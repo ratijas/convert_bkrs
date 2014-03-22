@@ -5,47 +5,74 @@
 '''
 
 import re # для check_id()
+from rm_unicode import *
 
-_amp_re = re.compile( r'\&([^\#])' )
+def indent():
+	ind = [True]
 
-def escape_xml_specials( value ):
-	'''
-	escape_xml_specials( s ) -> str
+	def set_indent( b ):
+		ind[0] = bool( b )
 
-	замена "опасных" символов строки на их xml-эквиваленты
-	заменяются <, ?, >, кавычки (одинарные и двойные), переносы строк
-	'''
-	return re.sub(	_amp_re, r'&amp;\1', value ) \
-		.replace( r'<', r'&#60;' )	\
-		.replace( r'>', r'&#62;' )	\
-		.replace( "'",  r'&#39;' )	\
-		.replace( '"',  r'&#34;' )	\
-		.replace( '\n', r'\n' )
+	def is_indent():
+		return ind[0]
 
-def check_id( s ):
-	'''
-	check_id( s ) -> bool
+	return set_indent, is_indent
+set_indent, is_indent = indent()
+del indent
 
-	проверка идентификатора
-	только строки, состоящие только из латинских букв, цифр или подчёркиваний и дефисов
-	'''
-	return isinstance( s, str ) and bool( re.match( '[_A-Za-z][-_a-zA-Z0-9]*$', s ))
+
+def escape_xml_specials():
+	_amp_re = re.compile( ur'\&([^\#])', re.UNICODE )
+
+	def escape_xml_specials( value ):
+		'''
+		escape_xml_specials( s ) -> str
+
+		замена "опасных" символов строки на их xml-эквиваленты
+		заменяются <, ?, >, кавычки (одинарные и двойные), переносы строк
+		'''
+		value = u( value )
+		value = re.sub(	_amp_re, ur'&amp;\1', value ) \
+			.replace( ur'<', ur'&#60;' )	\
+			.replace( ur'>', ur'&#62;' )	\
+			.replace( u"'",  ur'&#39;' )	\
+			.replace( u'"',  ur'&#34;' )	\
+			.replace( u'\n', ur'\n' )
+		return utf( value )
+	return escape_xml_specials
+escape_xml_specials = escape_xml_specials()
+
+def check_id():
+	id_re = re.compile( u'[_A-Za-z][-_a-zA-Z0-9]*$', re.UNICODE )
+	def check_id( s ):
+		'''
+		check_id( s ) -> bool
+
+		проверка идентификатора
+		только строки, состоящие только из латинских букв, цифр или подчёркиваний и дефисов
+		'''
+		return ( isinstance( s, str ) or isinstance( s, unicode )) and bool( re.match( id_re, s ))
+	return check_id
+check_id = check_id()
 
 
 class xml_stuff( object ):
-	"""
+	'''
 	абстрактный класс для xml.
 
 	определяет методы для работы с префиксами и названиями тегов/ аттрибутов
-	"""
+	'''
 	def __init__( self, prefix='', name='' ):
+		prefix = u( prefix )
+		name = u( name )
+
 		super( xml_stuff, self ).__init__()
 
 		if not check_id( name ):
 			raise Exception( 'xml_stuff: плохое имя (%s)' % name )
 		self.name = name
 
-		if prefix is not '':
+		if prefix is not u'':
 			if not check_id( prefix ):
 				raise Exception( 'xml_stuff: плохой префикс (%s)' % prefix )
 			self.prefix = prefix
@@ -67,29 +94,33 @@ class xml_stuff( object ):
 		префикс и имя xml- тега, аттрибута, разделённые двоеточием
 		prefix:name
 		'''
-		s = ''
+		s = None
 		if self.prefix:
-			s = '%s:%s' % ( self.prefix, self.name )
+			s = u'%s:%s' % ( self.prefix, self.name )
 		else:
-			s = '%s' % self.name 
+			s = u'%s' % self.name 
 		return s
 
 
 class xml_attr( xml_stuff ):
-	"""
+	'''
 	аттрибут xml-узла
 
 	содержит обязательное имя, необязательные префикс и значение
 	prefix:name='value'
-	"""
+	'''
 	def __init__( self, prefix='', name='', value='' ):
 		'''
 		строка, передаваемая в параметре value проходит "очистку" функцией escape_xml_specials()
 		'''
+		prefix = u( prefix )
+		name = u( name )
+		value = u( value )
+
 		super( xml_attr, self ).__init__( prefix, name )
 
 		if value is not '':
-			self.value = escape_xml_specials( value )
+			self.value = u( escape_xml_specials( value ))
 		else:
 			self.value = None
 
@@ -106,25 +137,30 @@ class xml_attr( xml_stuff ):
 		если нет префикса, имени не предшествует двоеточие
 			name="value"
 		'''
-		s = ' '
+		s = u' '
 		if self.prefix is not None:
-			s += '%s:' % self.prefix
+			s += u'%s:' % self.prefix
 
-		s += '%s' % self.name
+		s += u'%s' % self.name
 
 		if self.value is not None:
-			s += '="%s"' % self.value
+			s += u'="%s"' % self.value
 
-		return s
+		return utf( s )
 
 
 class xml_node( xml_stuff ):
-	"""
+	'''
 	xml-узел собственной персоной
-	"""
+	'''
 
-	indent = 0		# при конвертации в строку содержит стэк вложеных тегов
-	'содержит кол-во вложеных тегов, которое, используется для форматирования тега как строки'
+	indent = 0
+	'''
+	содержит кол-во вложеных тегов; используется для форматирования тега как строки
+
+	чтобы отключить отступы, установите
+	``__module__.no_indent = True''
+	'''
 
 	def __init__( self, prefix='', name='', single=False, attr=()):
 		'''
@@ -133,6 +169,9 @@ class xml_node( xml_stuff ):
 		single -- явно укажи 'труъ', если тег не должен ничего содержать, т.е. самозакрывается <tag />
 		attr   -- аттрибуты тега, созданные при помощи класса xml_attr. любое перечисляемое множество
 		'''
+		prefix = u( prefix )
+		name = u( name )
+
 		super( xml_node, self ).__init__( prefix, name )
 
 		if not isinstance( single, bool ):
@@ -154,28 +193,32 @@ class xml_node( xml_stuff ):
 
 		формирует строковое представление тега с красивенькими такими отступами
 		'''
+		s = u''						# результат
 		h = self.head()				# имя тега, включая префикс
-		i = '\n%s' % ( '\t' * self.__class__.indent )		# indent, величина отступа
-		s = i 						# результат
+		i = u'\n%s' % ( u'\t' * self.__class__.indent )		# indent, величина отступа
+
+		if is_indent():
+			s = i
 
 		self.__class__.indent += 1
 
-		s += r'<%s' % h			# открыть тег
+		s += ur'<%s' % h			# открыть тег
 
-		s += ''.join( map( str, self._attr_list ))		  # добавить аттрибуты
+		s += u''.join( map( u, self._attr_list ))		  # добавить аттрибуты
 
 		if self.single:
-			s += r'/>'				# закрыть тег-одиночку
+			s += ur'/>'				# закрыть тег-одиночку
 		else:
-			s += r'>'									  # закрыть открывающий тег
+			s += ur'>'									  # закрыть открывающий тег
 			if len( self._child_list ) is not 0:
-				s += ''.join( map( str, self._child_list ))	  # добавить контент
-				s += i 				# новая строка после потомков
-			s += r'</%s>' % h
+				s += u''.join( map( u, self._child_list ))	  # добавить контент
+				if is_indent():
+					s += i 				# новая строка после потомков
+			s += ur'</%s>' % h
 
 		self.__class__.indent -= 1
 
-		return s
+		return utf( s )
 
 	def __contains__( self, other ):
 		if isinstance( other, xml_attr ):
@@ -194,8 +237,7 @@ class xml_node( xml_stuff ):
 		if isinstance( node, self.__class__ ):
 			self._child_list.append( node )
 		else:
-			print node
-			raise Exception( 'попытка добавить в дерево элемент, который не является подклассом \'xml_node\':', node )
+			raise Exception( 'попытка добавить в дерево элемент, который не является подклассом \'xml_node\': %s', node.__repr__())
 
 	def add_child( self, *node ):
 		'''
@@ -222,8 +264,7 @@ class xml_node( xml_stuff ):
 		добавить в тег непосредственно xml-код
 		предпочтительнее использовать метод add_child()
 		'''
-		s = str( s )
-		self._child_list.append( s )
+		self._child_list.append( u( s ))
 
 	def _add_attr( self, attr ):
 		'''
@@ -236,8 +277,7 @@ class xml_node( xml_stuff ):
 					break
 			self._attr_list.append( attr )
 		else:
-			print attr
-			raise Exception( '_add_attr: попытка добавить в тег аттрибут, который не является подклассом \'xml_attr\':', attr )
+			raise Exception( '_add_attr: попытка добавить в тег аттрибут, который не является подклассом \'xml_attr\': %s', attr.__repr__())
 
 	def add_attr( self, *attr ):
 		'''
@@ -253,47 +293,50 @@ class xml_node( xml_stuff ):
 
 
 class xml_declaration( xml_node ):
-	"""
+	'''
 	создание декларации xml-документа в виде <?xml ... ?>
-	"""
+	'''
 	def __init__(self, *attr ):
 		'''
 		передаваемые значения -- аттрибуты в обёртке 'xml_attr'
 		'''
 		super( xml_declaration, self )	\
-			.__init__( prefix='', name='xml', single=True, attr=attr )
+			.__init__( prefix='', name=u'xml', single=True, attr=attr )
 
 	def __str__( self ):
-		return '<?xml%s?>' % ''.join( map( str, self._attr_list ))		  # добавить аттрибуты
+		return utf( u'<?xml%s?>' % u''.join( map( u, self._attr_list )))		  # добавить аттрибуты
 		
 
 class xml_text( xml_node ):
-	"""
+	'''
 	контейнер для текста в xml-теге
 
 	специальные символы автоматически заменяются
-	"""
+	'''
 	def __init__( self, text ):
-		self.text = escape_xml_specials( text )
+		self.text = u( escape_xml_specials( utf( text )))
 
 	def __str__( self ):
 		'''
 		учитывается текущий уровень отступов для форматирования
 		'''
-		return '%s%s' % (( '\n' + '\t' * self.__class__.indent ), self.text ) 	# indent унаследован от родительского класса
+		if is_indent():
+			return utf( u'\n%s%s' % (( u'\t' * self.__class__.indent ), self.text )) 	# indent унаследован от родительского класса
+		else:
+			return utf( u'%s' % self.text )
 
 	def __eq__( self, other ):
 		if isinstance( other, self.__class__ ):
 			return self.text == other.text
 		else:
-			return self.text == str( other )
+			return self.text == u( other )
 		
 
-if __name__ == '__main__':
-
+def main():
+	# set_indent( True )
 	# обширный тест xml_node
 	print
-	print 'тестирование xnl_node'
+	print 'тестирование xml_node'
 
 	print '\nсоздание узла d:entry'
 	de = xml_node( prefix='d', name='entry' )
@@ -309,8 +352,8 @@ if __name__ == '__main__':
 
 
 	print '\nсоздание индекса сразу с аттрибутами'
-	xa1 = xml_attr( prefix='d', name='value', value='make' )
-	xa2 = xml_attr( 'd', 'title', 'make' )
+	xa1 = xml_attr( prefix='d', name='value', value='делаю' )
+	xa2 = xml_attr( 'd', 'title', 'делать' )
 	
 	x1 = xml_node( 'd', 'index', single=True, attr=( xa1, xa2 ))
 	print 'результат:', x1
@@ -321,7 +364,7 @@ if __name__ == '__main__':
 
 	print '\nдобавление текста'
 	h1 = xml_node( name='h1' )
-	h1.add_child( xml_text( 'make' ))
+	h1.add_child( xml_text( 'ничегонеделание' ))
 	de.add_child( h1 )
 	print 'результат:', de
 
@@ -333,9 +376,12 @@ if __name__ == '__main__':
 	print 'xa1 in x1 (должно быть True):', xa1 in x1
 	print 'm1 in x1 (должно быть False):', m1 in x1
 	try:
-		print '<string> in x1 (должно вызвать ошибку):', 'string' in x1
+		print '<string> in x1 (должно вызвать ошибку):', u'string' in x1
 	except Exception, e:
-		print 'произошла обишка:', e
+		print 'произошла обишка: %s' % e
 
 	print 'h1 in entry (должно быть True):', h1 in de
 	print 'x1 in h1 (должно быть False):', x1 in h1
+
+if __name__ == '__main__':
+	main()

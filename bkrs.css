@@ -15,8 +15,14 @@ body {
 
 .ch {
 	display: block;
-	font-family: 'arial unicode MS', sans-serif, arial;
-	font-size: 125% !important;
+	font-family: KaiTi, simsun, Nsimsun, STKaiti, STSong, 'arial unicode MS', sans-serif, arial;
+	font-size: 150% !important;
+	margin-bottom: 8pt;
+}
+
+.py {
+	display: block;
+	font-size: 150%;
 	margin-bottom: 8pt;
 }
 

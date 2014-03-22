@@ -8,6 +8,7 @@
 '''
 
 import re
+from rm_unicode import *
 
 def colorize( textContent ):
 	'''
@@ -57,6 +58,24 @@ def skip():
 
 skip = skip()
 
+def plain_pin_yin():
+	diactris_table = (
+		( u'[āáǎăà]',		u'a' ),
+		( u'[ēéěè]',		u'e' ),
+		( u'[ōóǒò]',		u'o' ),
+		( u'[ūúǔùǖǘǚǜ]',	u'u' ),
+		( u'[īíǐì]',		u'i' )
+	)
+	def plain_pin_yin( s ):
+		'упрощение поиска: замена букв с тонами на те же, но без тонов'
+		py_plain = u( s ).lower()               #  нижний регистр
+
+		for regex, sub in diactris_table:
+			py_plain = re.sub( regex, sub, py_plain )
+
+		return py_plain
+	return plain_pin_yin
+plain_pin_yin = plain_pin_yin()
 
 def search_for_pin_yin_in_string( s ):
 	'''
@@ -69,22 +88,9 @@ def search_for_pin_yin_in_string( s ):
 	'''
 	result = []
 
-	diactris_table = (
-		( u'[āáǎăà]',		u'a' ),
-		( u'[ēéěè]',		u'e' ),
-		( u'[ōóǒò]',		u'o' ),
-		( u'[ūúǔùǖǘǚǜ]',	u'u' ),
-		( u'[īíǐì]',		u'i' )
-	)
-	
-	if not isinstance( s, unicode ):
-		s = unicode( s, errors="ignore" )
+	s = u( s )
 
-	#  упрощение поиска: замена букв с тонами на те же, но без тонов 
-	py_plain = s.lower()               #  нижний регистр
-
-	for regex, sub in diactris_table:
-		py_plain = re.sub( regex, sub, py_plain )
+	py_plain = plain_pin_yin( s )
 
 	#  пройтись по всей строке 
 	char_p = 0
@@ -154,7 +160,7 @@ def search_for_pin_yin_in_string( s ):
 			# в словарь под ключом, равным текущему индексу
 			result.append({
 				'start': char_p,
-				'value': s[ char_p : char_p + py_length]
+				'value': utf( s[ char_p : char_p + py_length])
 				})
 			#  сдвинуть указатель за пределы текущего слова 
 			char_p += py_length
@@ -229,10 +235,10 @@ def colorize_pin_yin( text, pin_yin_pairs ):
 def determineTone():
 
 	# статические переменные
-	re1 = re.compile( u"[āēūǖīō]",  re.L )
-	re2 = re.compile( u"[áéúǘíó]",  re.L )
-	re3 = re.compile( u"[ǎăěǔǚǐǒ]", re.L )
-	re4 = re.compile( u"[àèùǜìò]",  re.L )
+	re1 = re.compile( u"[āēūǖīō]",  re.UNICODE )
+	re2 = re.compile( u"[áéúǘíó]",  re.UNICODE )
+	re3 = re.compile( u"[ǎăěǔǚǐǒ]", re.UNICODE )
+	re4 = re.compile( u"[àèùǜìò]",  re.UNICODE )
 
 	def determineTone( pin_yin_word ):
 		'''
@@ -240,6 +246,7 @@ def determineTone():
 
 		возвращает тон для переданого слога
 		'''
+		pin_yin_word = u( pin_yin_word )
 		# быстрее и компактнее так, чем делать цикл и массив
 		# тон слога определяется наличием одного из этих символов
 

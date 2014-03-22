@@ -4,13 +4,13 @@
 import sys, os
 from convert import *
 
-out_file_name = u'bruks.xml'
-in_file_name  = u'БРуКС.dsl'
+out_file_name = u'bkrs.xml'
+in_file_name  = u'bkrs.dsl'
 
 in_file		= None
 out_file	= None
 
-set_lang( lang_ru_ch )
+set_lang( lang_ch_ru )
 
 def open_resorces():
 	global in_file
@@ -34,11 +34,11 @@ def main():
 	close_resorces()
 
 def make():
-	if 0 != os.system( 'make bruks' ):
+	if 0 != os.system( 'make bkrs' ):
 		raise Exception( '`make` failed' )
 
 def install():
-	if 0 != os.system( 'make install-bruks' ):
+	if 0 != os.system( 'make install-bkrs' ):
 		raise Exception( '`make install` failed' )
 	
 
@@ -49,6 +49,9 @@ if __name__ == u'__main__':
 	install_flag = False
 	
 	if len( sys.argv ) > 1 and ( sys.argv[ 1 ] == '-t' ):
+		global out_file
+		out_file = open( out_file_name, 'r' )
+		set_out_file( out_file )
 		test()
 		exit()
 
@@ -58,7 +61,7 @@ if __name__ == u'__main__':
 			install_flag = True
 		else:
 			in_file_name = sys.argv[ 1 ]
-
+			
 	main()
 	test()
 	make()
