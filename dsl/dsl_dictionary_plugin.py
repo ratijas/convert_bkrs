@@ -15,7 +15,7 @@ class dslDictionaryPlugin( object ):
 		# альтернативный вариант default value для изменяемых типов
 		headers = headers if headers else {}
 		
-		# переписать
+		# переписать себе
 		for key in headers:
 			self.headers[key] = headers[ key ]
 
