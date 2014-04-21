@@ -6,7 +6,7 @@ u'''
 '''
 
 import re
-from rm_unicode import u, utf
+from u import *
 
 try:
 	from unidecode import unidecode
