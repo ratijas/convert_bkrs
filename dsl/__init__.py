@@ -23,10 +23,10 @@ def set_app_data( data ):
 	set_app_data({ data1: val1, ...})
 
 	требуемые параметры:
-		infile
-		outfile
-		dictionary_plugin_class
-		entry_plugin_class
+		INFILE
+		OUTFILE
+		DICTIONARY_PLUGIN_CLASS
+		ENTRY_PLUGIN_CLASS
 	'''
 	global app_data
 	app_data[ INFILE ] = data[ INFILE ]
@@ -39,6 +39,7 @@ def convert():
 	e = dslEntry(
 		plugin = app_data[ ENTRY_PLUGIN_CLASS ]()
 	)
+
 	d = dslDictionary(
 		plugin = app_data[ DICTIONARY_PLUGIN_CLASS ](),
 		infile = app_data[ INFILE ],
@@ -46,7 +47,7 @@ def convert():
 		entry_instance = e
 	)
 
-	pass
+	d.convert()
 
 
 ###############################################################################
