@@ -2,7 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 from apple_dictionary_plugin import AppleDictionaryPlugin
+from dsl.u import *
 
+matter_filename = 'front_back_matter.html'
 
 class RatijasDictionaryPlugin( AppleDictionaryPlugin ):
 	"""
@@ -13,9 +15,13 @@ class RatijasDictionaryPlugin( AppleDictionaryPlugin ):
 	def __init__( self ):
 		super( RatijasDictionaryPlugin, self ).__init__()
 
-		f = open( 'front_back_matter.html', 'r' )
-		self.matter = f.read()
-		f.close()
+		self.matter = u''
+		try:
+			f = open( matter_filename, 'r' )
+			self.matter = u( f.read())
+			f.close()
+		except Exception as e:
+			print 'RatijasDictionaryPlugin: не найдено файла обложки словаря (%s)' % matter_filename
 
 		# конец __init__()
 
