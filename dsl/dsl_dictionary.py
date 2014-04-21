@@ -2,17 +2,21 @@
 # -*- coding: UTF-8 -*-
 
 from dsl_dictionary_plugin import *
+import re
+from u import *
+from dsl_entry import dslEntry
 
 class dslDictionary( object ):
 	"""
-	dslDictionary( plugin, infile, outfile ) -> object
+	dslDictionary( plugin, infile, outfile, entry_instance ) -> object
 
 	класс-обёртка для словаря. разбирает заголовки dsl файла, кстати.
 	plugin -- экземпляр подкласса dslDictionaryPlugin
 	infile -- файл или имя входного файла dsl
 	outfile -- файл или имя выходного файла (формат зависит от плагина)
+	entry_instance -- экземпляр класса dslEntry, желательно, заправленый плагином
 	"""
-	def __init__( self, plugin=None, infile=None, outfile=None ):
+	def __init__( self, plugin=None, infile=None, outfile=None, entry_instance=None ):
 		super( dslDictionary, self ).__init__()
 
 		# плагин либо dslDictionaryPlugin, либо ничего
@@ -20,10 +24,6 @@ class dslDictionary( object ):
 			raise TypeError( 'dslDictionary: `plugin` должен быть подкласом dslDictionaryPlugin' )
 		else:
 			self.plugin = plugin
-
-		# заголовки будут позже
-		# self.headers = {}
-		# !закомментировано: заголовки переехали в плагин
 
 		# файл для чтения. можно дать имя файла
 		#   ваш к.о.
@@ -36,7 +36,7 @@ class dslDictionary( object ):
 		else:
 			self.infile = infile
 
-
+		# аналогично, можно передать имя файла
 		if not isinstance( outfile, file ):
 			if isinstance( outfile, basestring ):
 				try:
@@ -46,24 +46,62 @@ class dslDictionary( object ):
 		else:
 			self.outfile = outfile
 
+		if not isinstance( entry_instance, dslEntry ):
+			raise Exception( 'dslDictionary: `entry_instance` должен быть экземпляром dslEntry' )
+		else:
+			self.entry = entry_instance
 
-	def read_headers( self, f ):
-		headers = {}
+		# конец __init__()
+
+	def read_headers( self ):
+		headers = []
+		print 'read_headers: begin'
+		while True:
+			self.last_read = u( self.infile.readline().strip())
+			# print 'read_headers: прочел "%s"' % utf( self.last_read )
+
+			if self.last_read.startswith( u'#' ):
+				_ = re.match(
+					# #INDEX_LANGUAGE "Russian"
+					# #      \w+    \s " .+  "
+					ur'#(\w+)\s+("?)(.+)\2',
+					self.last_read,
+					re.UNICODE
+				)
+				if _ is not None:
+					# \1 -- имя, \3 -- значение
+					_ = _.groups()
+					headers.append({ 'title': _[0], 'value': _[2] })
+				else:
+					break
+			else:
+				break
+
 		return headers
 
 	def convert( self ):
 		# метаданные словаря. строки, которые начинаются с решетки
-		self.headers = self.read_headers( self.infile )
+		self.plugin.set_headers( self.read_headers())
 
 		# плагин пишет какие-то данные в начале словаря. <d:dictionary ...>, например
-		self.plugin.dictionary_begin()
+		_ = self.plugin.dictionary_begin()
+		self.outfile.write( utf( _ ))
 
 		# напечатать все статьи
 		self._print_entries()
 
 		# припечатать outro в конце. </d:dictionary>, например
-		self.plugin.dictionary_end()
+		_ = self.plugin.dictionary_end()
+		self.outfile.write( utf( _ ))
+
+		# последняя новая строчка
+		self.outfile.write( u'\n' )
 
 	def _print_entries( self ):
 		print 'printing entries...'
+		# ...
+
+		# 
+
+		# ...
 		print 'done'
