@@ -78,12 +78,14 @@ class dslDictionary( object ):
 				break
 
 		return headers
+		# конец read_headers()
+
 
 	def convert( self ):
 		# метаданные словаря. строки, которые начинаются с решетки
 		self.plugin.set_headers( self.read_headers())
 
-		# плагин пишет какие-то данные в начале словаря. <d:dictionary ...>, например
+		# плагин пишет какие-то данные в начале словаря. <d:dictionary ...>, например, обложку, ...
 		_ = self.plugin.dictionary_begin()
 		self.outfile.write( utf( _ ))
 
@@ -95,13 +97,34 @@ class dslDictionary( object ):
 		self.outfile.write( utf( _ ))
 
 		# последняя новая строчка
-		self.outfile.write( u'\n' )
+		self.outfile.write( '\n' )
+
+		# конец convert
+
 
 	def _print_entries( self ):
 		print 'printing entries...'
 		# ...
 
-		# 
+		writen = 0
+		while True:
+			# следующий
+			_ = self.entry.read( self.infile )
+
+			# признак окончания файла?
+			if _ is None:
+				break
+
+			# идём дальше
+			self.entry.parse()
+
+			# print u'-' * 20
+			# print self.entry.__str__()
+
+			# вывод в файл
+			self.outfile.write( utf( self.entry.__str__()))
+
+			writen += 1
 
 		# ...
 		print 'done'
