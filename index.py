@@ -62,17 +62,25 @@ def generate_hz_indexes( s, reading ):
 			jieguo.add( u'*%s*' % part_mid )
 	# пиньинь
 	if reading != u'_':
+		# исходный, с диактрисами
 		jieguo.add( reading )
 
+		# найти пиньинь, "выдрать" его значение из результатов, преобразовать всех в юникод
 		py = map( u, [ x['value'] for x in color.search_for_pin_yin_in_string( reading )])
-		jieguo.add( u' '.join( py )) 		# с диактрисами
+		# py -- список unicode строк со слогами пиньиня
 
+		# с диактрисами, с пробелами по слогам
+		jieguo.add( u' '.join( py ))
+
+		# с цифрами вместо тонов, с пробелами по слогам
 		jieguo.add( u' '.join(
-				map( lambda p: u'%s%d' % (
-					color.plain_pin_yin( p ),
-					color.determineTone( p )
+				map(
+					lambda p: u'%s%d' % (		# соеденить:
+						color.plain_pin_yin( p ),	# пиньинь без диактрисов
+						color.determineTone( p )	# номер тона
 					),
-				py )
+					py	# для каждого из слогов
+				)
 			)
 		)
 

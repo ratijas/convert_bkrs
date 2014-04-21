@@ -7,7 +7,7 @@ from dsl_entry import *
 from test_plugin import *
 
 ########################
-DEBUG_MODE = True
+DEBUG_MODE = False
 ########################
 INFILE = 'infile'
 OUTFILE = 'outfile'
@@ -16,11 +16,7 @@ ENTRY_PLUGIN_CLASS = 'entry_plugin_class'
 
 # глобальные переменные -- зло
 # нужно вынести в замыкние
-app_data = {} if not DEBUG_MODE else \
-{
-	'infile': 'bkrs.dsl',
-	'outfile': 'bruks_text.xml'
-}
+app_data = {}
 
 def set_app_data( data ):
 	'''
@@ -51,6 +47,17 @@ def convert():
 	)
 
 	pass
+
+
+###############################################################################
+# тестирование
+###############################################################################
+
+if DEBUG_MODE:
+	app_data = {
+		'infile': 'bkrs.dsl',
+		'outfile': 'bruks_text.xml'
+	}
 
 def main():
 	if not DEBUG_MODE:
