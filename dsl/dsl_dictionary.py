@@ -51,11 +51,11 @@ class dslDictionary( object ):
 		else:
 			self.entry = entry_instance
 
-		# конец __init__()
+		# конец __init__
 
 	def read_headers( self ):
 		headers = []
-		print 'read_headers: begin'
+		print 'читаю заголовки...'
 		while True:
 			self.last_read = u( self.infile.readline().strip())
 			# print 'read_headers: прочел "%s"' % utf( self.last_read )
@@ -78,7 +78,7 @@ class dslDictionary( object ):
 				break
 
 		return headers
-		# конец read_headers()
+		# конец read_headers
 
 
 	def convert( self ):
@@ -103,7 +103,7 @@ class dslDictionary( object ):
 
 
 	def _print_entries( self ):
-		print 'printing entries...'
+		print 'печатаю статьи...'
 		# ...
 
 		writen = 0
@@ -126,5 +126,4 @@ class dslDictionary( object ):
 
 			writen += 1
 
-		# ...
-		print 'done'
+	# конец _print_entries
