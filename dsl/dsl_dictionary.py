@@ -5,6 +5,8 @@ from dsl_dictionary_plugin import *
 import re
 from u import *
 from dsl_entry import dslEntry
+import progress_bar
+import os
 
 class dslDictionary( object ):
 	"""
@@ -51,7 +53,16 @@ class dslDictionary( object ):
 		else:
 			self.entry = entry_instance
 
+		self.entries_count = 0
+		f = os.popen( "grep -c -e '^$' '%s'" % self.infile.name )
+		self.entries_count = int( f.read()) - 1	# как правило, их оказывается на одну меньше
+		f.close()
+		self.progress_drawer = progress_bar.ProgressBarController( 0, self.entries_count )
 		# конец __init__
+
+	def __del__( self ):
+		self.infile.close()
+		self.outfile.close()
 
 	def read_headers( self ):
 		headers = []
@@ -72,6 +83,7 @@ class dslDictionary( object ):
 					# \1 -- имя, \3 -- значение
 					_ = _.groups()
 					headers.append({ 'title': _[0], 'value': _[2] })
+					print u'dslDictionary.read_headers: title: "%s", value: "%s"' % ( _[0], _[2] )
 				else:
 					break
 			else:
@@ -83,30 +95,36 @@ class dslDictionary( object ):
 
 	def convert( self ):
 		# метаданные словаря. строки, которые начинаются с решетки
-		self.plugin.set_headers( self.read_headers())
+		headers = self.read_headers()
+		if self.plugin:
+			self.plugin.set_headers( headers )
 
 		# плагин пишет какие-то данные в начале словаря. <d:dictionary ...>, например, обложку, ...
-		_ = self.plugin.dictionary_begin()
-		self.outfile.write( utf( _ ))
+		if self.plugin:
+			_ = self.plugin.dictionary_begin()
+			self.outfile.write( utf( _ ) )
 
 		# напечатать все статьи
 		self._print_entries()
 
 		# припечатать outro в конце. </d:dictionary>, например
-		_ = self.plugin.dictionary_end()
-		self.outfile.write( utf( _ ))
-
-		# последняя новая строчка
-		self.outfile.write( '\n' )
+		if self.plugin:
+			_ = self.plugin.dictionary_end()
+			self.outfile.write( utf( _ ))
 
 		# конец convert
 
 
 	def _print_entries( self ):
+		'''
+		# Internal
+		'''
 		print 'печатаю статьи...'
 		# ...
 
 		writen = 0
+
+		# выход из цикла по окончании файла
 		while True:
 			# следующий
 			_ = self.entry.read( self.infile )
@@ -118,12 +136,19 @@ class dslDictionary( object ):
 			# идём дальше
 			self.entry.parse()
 
-			# print u'-' * 20
-			# print self.entry.__str__()
-
 			# вывод в файл
-			self.outfile.write( utf( self.entry.__str__()))
+			out = utf( self.entry.__str__())
+
+			self.outfile.write( out + '\n' )
 
 			writen += 1
+			if writen % 10 == 0:
+				self.statistic( writen )
+				self.progress_drawer.set_value( writen )
 
-	# конец _print_entries
+		self.progress_drawer.set_value( writen )
+		print u'обработано %d статей' % writen
+		# конец _print_entries
+
+	def statistic( self, writen ):
+		print u'#% 6d: %s' % ( writen, self.entry.title )

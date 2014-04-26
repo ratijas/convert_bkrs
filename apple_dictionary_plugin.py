@@ -13,8 +13,7 @@ class AppleDictionaryPlugin( dsl.dslDictionaryPlugin ):
 ''' + u( self.front_back_matter())
 
 	def dictionary_end( self ):
-		return ur'''
-</d:dictionary>
+		return ur'''</d:dictionary>
 '''
 
 	def front_back_matter( self ):

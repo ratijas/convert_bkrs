@@ -3,6 +3,8 @@
 
 from dsl_entry_plugin import dslEntryPlugin
 from u import *
+import normalize
+from dsl_to_html import dsl_to_html
 
 class dslEntry( object ):
 	"""
@@ -19,6 +21,7 @@ class dslEntry( object ):
 
 		self.entry = u''
 		self.title = u''
+		self.content = u''
 
 		self.plugin = None
 		if plugin and not isinstance( plugin, dslEntryPlugin ):
@@ -33,7 +36,7 @@ class dslEntry( object ):
 		'''
 		считывает статью из файла.
 
-		предпологается, что статьи разделны хотя бы одной пустой строкой
+		предполагается, что статьи разделны хотя бы одной пустой строкой
 		в случае неудачи (например, EOF) возвращает None
 		'''
 		self.title = u''
@@ -41,8 +44,10 @@ class dslEntry( object ):
 		while True:
 			_ = u( f.readline())
 			if _ is not u'\n':
-				self.title = _
+				self.title = _.strip()
 				break
+
+		# print u'dslEntry.read: прочитал "%s"' % self.title
 
 		self.entry = u''
 		# читать до пустой строки или EOF
@@ -53,37 +58,65 @@ class dslEntry( object ):
 			else:
 				break
 
-		if len( self.entry.strip()) == 0:
+		self.entry = self.entry.strip()
+		if len( self.entry ) == 0:
 			return None
 		return self
 		# конец read
 
+
 	def parse( self ):
+		# print u'пáршу статью с заголовком "%s"' % self.title
 		t, e = self.title, self.entry
 
-		t, e = self.plugin.preparse( t, e )
-		t, e = self._parse( t, e )
-		t, e = self.plugin.postparse( t, e )
+		# экранизировать угловые скобки
+		e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
+		# полный вариант заголовка со скобками
+		t = normalize.brackets( t )
 
-		self.title, self.entry = t, e
+		if self.plugin:
+			t, e = self.plugin.preparse( t, e )
+
+		t, e = self._parse( t, e )
+
+		if self.plugin:
+			content = self.plugin.postparse( t, e )
+		else:
+			content = ur'%s\n%s' % ( t, e )
+
+		# убрать оставшуюся экранизацию с квадратных скобок
+		content = content.replace( ur'\[', u'[' ).replace( ur'\]', u']' )
+
+		self.content = content
 		return self
+		# конец parse
+
 
 	def _parse( self, title, entry ):
-		title = title.strip()
+		'''
+		# Internal. делает основное превращение dsl в html 
+		'''
 
-		# entry = to_xhtml( title, entry )
+		title = normalize.full( title )
+		title = ur'<h1>%s</h1>' % title
+		# print u'_parse: title = "%s"' % title
 
-			# full = normalize.brackets( title )
-			# full = normalize.full( full )
-
-			# h = xml_node( name='span', attr=( xml_attr( name='class', value='ch' ), ))
-			# h.add_child( *content( full ) )
-
-			# en.add_child( h )
-
-			# return en
+		entry = dsl_to_html( entry ).strip()
 
 		return title, entry
+		# конец _parse
+
 
 	def __str__( self ):
-		return self.title + u'\n' + self.entry
+		return self.content
+
+
+if __name__ == '__main__':
+	from io import StringIO
+	e = dslEntry()
+	s = u'''бывать{(ся)}
+ [m1]бывает ([c][i]прим.[/c] часто встречаются[/i])[/m]'''
+	e.read( StringIO( s ) )
+	e.parse()
+
+	print u'исходный:\n'+s+u'\nрезультат:\n'+e.__str__()

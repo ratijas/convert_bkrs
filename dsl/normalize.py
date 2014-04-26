@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-u'''
+'''
 модуль normalize
 
 удалить пробелы в начале, в конце, а также заменить смежные пробелы на один
@@ -10,7 +11,7 @@ from u import *
 
 try:
 	from unidecode import unidecode
-except:
+except ImportError as e:
 	import sys
 	print >>sys.stderr, '''
 модуль 'unidecode' не установлен на этой машине.
@@ -28,7 +29,7 @@ def spaces():
 		'''
 		обрезать пробелы внале и вконце, заменить повторяющиеся пробелы и табуляции на один пробел
 		'''
-		return utf( re.sub( space_re, u' ', u( s ).strip() ))
+		return u( re.sub( space_re, u' ', u( s ).strip() ))
 	return spaces
 spaces = spaces()
 
@@ -86,7 +87,7 @@ def brackets():
 		if s.find( u'{' ) is not -1:		# -1 значит не найденно
 			for exp, sub in re_sub:
 				s = re.sub( exp, sub, s )
-		return utf( spaces( s ))
+		return spaces( s )
 	return brackets
 brackets = brackets()
 
@@ -97,7 +98,7 @@ def full( s ):
 
 	длинный вариант строки с квадратными скобками
 	'''
-	return utf( u( s ).replace( '[', '' ).replace( ']', '' ))
+	return u( s ).replace( u'[', u'' ).replace( u']', u'' )
 
 
 def short():
@@ -109,25 +110,25 @@ def short():
 
 		короткий вариант строки с квадратными скобками
 		'''
-		return utf( spaces( re.sub( del_brackets_re, u'', u( s ))))
+		return spaces( re.sub( del_brackets_re, u'', u( s )))
 	return short
 short = short()
 
 def id():
-	non_id_re = re.compile( r'[^a-zA-Z0-9_]' )
+	non_id_re = re.compile( ur'[^a-zA-Z0-9_]', re.UNICODE )
 
 	def id( s ):
 		s = u( s )
-		s = unidecode( s )
+		s = unidecode( s )	# возвращает ascii
 		s = u( s )
 		s = s.strip()
 		s = brackets( s )
 		s = full( s )
 		s = s.lower()
 		s = spaces( s )
-		s = s.replace( ' ', '_' )
-		s = re.sub( non_id_re, '_', s )
-		s = utf( s )
+		s = s.replace( u' ', u'_' )
+		s = re.sub( non_id_re, u'_', s )
+		s = u( s )
 		return s
 	return id
 id = id()
