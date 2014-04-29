@@ -110,19 +110,19 @@ tr "\r" "\n" < "$PLIST_NAME" > $OBJECTS_DIR/dict.plist || error "Error."
 
 # Merge property to dictionary template.
 xsltproc "$DICT_BUILD_TOOL_BIN"/extract_property.xsl $OBJECTS_DIR/dict.plist > $OBJECTS_DIR/dict_prop_list.txt || error "Error."
-rm $OBJECTS_DIR/dict.plist
+# rm $OBJECTS_DIR/dict.plist
 "$DICT_BUILD_TOOL_BIN"/generate_dict_template.sh $COMPRESS_OPT $ENCRYPT_OPT $TRIE_OPT $OBJECTS_DIR/dict_prop_list.txt > $OBJECTS_DIR/customized_template.plist || error "Error."
 plutil -s $OBJECTS_DIR/customized_template.plist || error "Error."
-rm $OBJECTS_DIR/dict_prop_list.txt
+# rm $OBJECTS_DIR/dict_prop_list.txt
 
 # Preprocess sources.
 echo "- Preprocessing dictionary sources."
 tr "\r" "\n" < "$SRC_FILE" > $OBJECTS_DIR/dict.xml || error "Error."
 # Replace localizable <index> format to the standard one
 sed 's/<d:index>[[:blank:]\n]*<d:index_value>\([^<]*\)<\/d:index_value>[[:blank:]\n]*<d:index_title>\([^<]*\)<\/d:index_title>[[:blank:]\n]*<\/d:index>/<d:index d:value="\1" d:title="\2"\/>/g' $OBJECTS_DIR/dict.xml > $OBJECTS_DIR/dict_mod.xml || error "Error."
-rm $OBJECTS_DIR/dict.xml
+# rm $OBJECTS_DIR/dict.xml
 "$DICT_BUILD_TOOL_BIN"/make_line.pl $OBJECTS_DIR/dict_mod.xml > $OBJECTS_DIR/dict.formattedSource.xml || error "Error."
-rm $OBJECTS_DIR/dict_mod.xml
+# rm $OBJECTS_DIR/dict_mod.xml
 "$DICT_BUILD_TOOL_BIN"/make_body.pl $OBJECTS_DIR/dict.formattedSource.xml || error "Error."
 # The make_body.pl creates $OBJECTS_DIR/dict.body and $OBJECTS_DIR/dict.offset
 
@@ -132,7 +132,7 @@ echo "- Extracting index data."
 "$DICT_BUILD_TOOL_BIN"/extract_index.pl $OBJECTS_DIR/dict.formattedSource.xml > $OBJECTS_DIR/key_entry_list.txt || error "Error."
 "$DICT_BUILD_TOOL_BIN"/extract_referred_id.pl $OBJECTS_DIR/dict.formattedSource.xml > $OBJECTS_DIR/referred_id_list.txt || error "Error."
 "$DICT_BUILD_TOOL_BIN"/extract_front_matter_id.pl "$PLIST_NAME" >> $OBJECTS_DIR/referred_id_list.txt || error "Error."
-rm $OBJECTS_DIR/dict.formattedSource.xml
+# rm $OBJECTS_DIR/dict.formattedSource.xml
 
 
 ########
@@ -140,7 +140,7 @@ rm $OBJECTS_DIR/dict.formattedSource.xml
 # Prepare dictionary bundle.
 echo "- Preparing dictionary bundle."
 "$DICT_BUILD_TOOL_BIN"/make_dict_package $OBJECTS_DIR/dict.dictionary $OBJECTS_DIR/customized_template.plist || error "Error."
-rm $OBJECTS_DIR/customized_template.plist
+# rm $OBJECTS_DIR/customized_template.plist
 
 # Add body reocrd to dictionary.
 echo "- Adding body data."
@@ -148,27 +148,26 @@ echo "- Adding body data."
 # rm $OBJECTS_DIR/dict.offsets
 # rm $OBJECTS_DIR/dict.body
 
-
 # Make key body matching list
 echo "- Preparing index data."
 "$DICT_BUILD_TOOL_BIN"/replace_entryid_bodyid.pl $OBJECTS_DIR/entry_body_list.txt < $OBJECTS_DIR/key_entry_list.txt > $OBJECTS_DIR/key_body_list.txt || error "Error."
-rm $OBJECTS_DIR/key_entry_list.txt
+# rm $OBJECTS_DIR/key_entry_list.txt
 
 # Normalize key_text
 # "$DICT_BUILD_TOOL_BIN"/normalize_key_text.pl < $OBJECTS_DIR/key_body_list.txt > $OBJECTS_DIR/normalized_key_body_list.txt || error "Error."
 "$DICT_BUILD_TOOL_BIN"/normalize_key_text < $OBJECTS_DIR/key_body_list.txt > $OBJECTS_DIR/normalized_key_body_list_1.txt || error "Error."
-rm $OBJECTS_DIR/key_body_list.txt
+# rm $OBJECTS_DIR/key_body_list.txt
 
 if [ $do_add_supplementary_key -gt 0 ]
 then
 	"$DICT_BUILD_TOOL_BIN"/add_supplementary_key < $OBJECTS_DIR/normalized_key_body_list_1.txt > $OBJECTS_DIR/normalized_key_body_list_2.txt
-	rm $OBJECTS_DIR/normalized_key_body_list_1.txt || error "Error."
+	# rm $OBJECTS_DIR/normalized_key_body_list_1.txt || error "Error."
 else
 	mv $OBJECTS_DIR/normalized_key_body_list_1.txt $OBJECTS_DIR/normalized_key_body_list_2.txt || error "Error."
 fi
 
 "$DICT_BUILD_TOOL_BIN"/remove_duplicate_key.pl < $OBJECTS_DIR/normalized_key_body_list_2.txt > $OBJECTS_DIR/normalized_key_body_list.txt
-rm $OBJECTS_DIR/normalized_key_body_list_2.txt || error "Error."
+# rm $OBJECTS_DIR/normalized_key_body_list_2.txt || error "Error."
 
 
 # Add key_text index record to dictionary.

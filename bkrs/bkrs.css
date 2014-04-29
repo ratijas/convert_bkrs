@@ -2,45 +2,44 @@
 @namespace d url(http://www.apple.com/DTDs/DictionaryService-1.0.rng);
 
 d|entry {
+	display: block;
+	margin: 0em 0em 1.0em 0em;
 }
 
 body {
-	padding-top: 10pt;
+	margin-right: 1em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	font-family: arial, sans-serif;
+	font-size: 12pt;
+	line-height: 1.5em;
 }
 
-* {
-	font-family: arial, sans-serif;
-	font-size: 100%;
+.ch, .py, h1 {
+	line-height: 1em;
 }
 
 .ch {
 	display: block;
-	font-family: KaiTi, simsun, Nsimsun, STKaiti, STSong, 'arial unicode MS', sans-serif, arial;
-	font-size: 150% !important;
-	margin-bottom: 8pt;
+	font-family:"KaiTi,simsun,Nsimsun,STKaiti,STSong,arial unicode MS, sans-serif,arial";
+	font-size: 18pt;
+	/*margin-bottom: 8pt;*/
 }
 
 .py {
 	display: block;
-	font-size: 150%;
-	margin-bottom: 8pt;
+	font-size: 17pt;
+	margin: 0.2em 0em;
+	margin-bottom: 10pt;
 }
 
-h2 {
-	font-size: 125%;
-}
-
-h3	{
-	font-size: 100%;
+h1 {
+	font-size: 18pt;
+	font-weight: normal;
 }
 
 .i, .p {
 	font-style: italic;
-}
-
-.ln {
-	text-decoration: underline;
-	color: #008;
 }
 
 e, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
@@ -48,24 +47,27 @@ e, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
 }
 
 .m1 {
-	margin-left: 1em;
+	margin-left: 0em;
 }
 
 .m2 {
-	margin-left: 2em;
+	margin-left: 1em;
 }
 
 .m3 {
-	margin-left: 3em;
+	margin-left: 1.5em;
 }
 
-.m4, .m5, .m6, .m7, .m8, .m9 {
-	margin-left: 4em;
+.m4 {
+	margin-left: 2em;
+}
+
+.m5, .m6, .m7, .m8, .m9 {
+	margin-left: 2.5em;
 }
 
 .e {
 	color: #666;
-	margin-left: 1em;
 }
 
 .c, .p {
@@ -90,4 +92,8 @@ e, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
 .proper_delim {
 	border-top: 1px dashed gray;
 	margin: 0;
+}
+
+.green {
+	color: green;
 }

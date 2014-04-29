@@ -8,7 +8,7 @@
 '''
 
 import re
-from rm_unicode import *
+from dsl.u import u, utf
 
 def colorize( textContent ):
 	'''
@@ -186,7 +186,7 @@ def colorize_pin_yin( text, pin_yin_pairs ):
 	all_tones_are_zero = True
 
 	for el in pin_yin_pairs:
-		start, value = el['start'], el['value']
+		start, value = el['start'], u( el[ 'value' ])
 		# определить
 		t = determineTone( value );
 		# сохранить на потом
@@ -207,7 +207,7 @@ def colorize_pin_yin( text, pin_yin_pairs ):
 
 	for el in pin_yin_pairs:
 		# явно преобразовать. а то мало ли что
-		start, value, tone = int( el['start'] ), el['value'], el['tone']
+		start, value, tone = int( el['start'] ), u( el[ 'value' ]), el['tone']
 
 		# записать предшествующий не-пиньинь в родительский span
 			# резать от предыдущего конца
@@ -272,7 +272,7 @@ def main():
 	print u'search_for_pin_yin_in_string() ->'
 	for e in r:
 		print u'\t' u'start: %d,' u'\t' u'value: %s' % \
-			( e['start'], e['value'] )
+			( e[ 'start' ], u( e[ 'value' ]))
 
 	print u'colorize\n----'
 

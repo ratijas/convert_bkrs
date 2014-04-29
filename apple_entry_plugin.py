@@ -3,8 +3,9 @@
 
 import re
 from dsl import dslEntryPlugin
-from dsl.u import *
+from dsl.u import u, utf
 from dsl import normalize
+
 
 def get_id_for_header():
 	cnt = [0]
@@ -14,6 +15,8 @@ def get_id_for_header():
 		return s
 	return get_id_for_header
 get_id_for_header = get_id_for_header()
+
+
 
 class AppleEntryPlugin( dslEntryPlugin ):
 
@@ -25,8 +28,20 @@ class AppleEntryPlugin( dslEntryPlugin ):
 	def preparse():
 		# замыкание, приватные статические переменные
 		plain_replace_table = [
+			( ur'[c][i][*][ex]', ur'[*][ex][i][c]' ),		# защита от дураков
+			( ur'[c][i][ex]', ur'[ex][i][c]' ),
+			( ur'[ex][*]', ur'[*][ex]' ),
+			( ur'[/*][/ex]', ur'[/ex][/*]' ),
+			( ur'[m2][ex]', ur'<div class="m2 e" d:priority="2">' ),
+			( ur'[m3][ex]', ur'<div class="m3 e" d:priority="2">' ),
+			( ur'[m4][ex]', ur'<div class="m4 e" d:priority="2">' ),
 			( ur'[m2][*][ex]', ur'<div class="m2 e" d:priority="2">' ),
+			( ur'[m3][*][ex]', ur'<div class="m3 e" d:priority="2">' ),
+			( ur'[m4][*][ex]', ur'<div class="m4 e" d:priority="2">' ),
 			( ur'[/ex][/*][/m]', ur'</div>' ),
+			( ur'[/ex][/m]', ur'</div>' ),
+			( ur'[*][ex]', ur'<div class="e" d:priority="2">' ),
+			( ur'[/ex][/*]', ur'</div>' ),
 			( ur'[*]', ur'<div d:priority="2">' ),
 			( ur'[/*]', ur'</div>' )
 		]
@@ -40,6 +55,7 @@ class AppleEntryPlugin( dslEntryPlugin ):
 
 		def preparse( self, t, s ):
 			# запомнить для postparse
+			t = t.replace( u'"', u'&quot;' )
 			self.title = normalize.full( t )
 			self.title_short = normalize.short( t )
 
@@ -57,28 +73,48 @@ class AppleEntryPlugin( dslEntryPlugin ):
 		href_re = re.compile( ur'href="(.+?)"', re.UNICODE )
 
 		def postparse( self, t, s ):
-			s = href_re.sub( ur'href="x-dictionary:d:\1"', s )
-			return u'<d:entry id="{id}" d:title="{title}">{indx}{header}{content}</d:entry>'.format(
-				id = get_id_for_header( t ),
-				title = self.title,
-				indx = u''.join(
-					[
-						self.index( value, title )
-						for ( value, title ) in self.indexes()
-					]
-				),
-				header = t,
-				content = s
-			)
-
+			return \
+				u'<d:entry id="{id}" d:title="{title}">{indx}{header}{content}</d:entry>'	\
+				.format(
+					id		= get_id_for_header( t ),
+					title	= self.title,
+					indx	= u''.join([
+						ur'<d:index d:value="%s" d:title="%s"/>' % ( value, title )			\
+							for ( value, title ) in list( self.indexes() )					\
+								if value.strip() != u'' and title.strip() != u''
+						]),
+					header	= t,
+					content	= href_re.sub( ur'href="x-dictionary:d:\1"', s )
+				)
+			# конец postparse
 		return postparse
 	postparse = postparse()
 
 	def indexes( self ):
-		a = [( self.title, self.title )]
-		if self.title is not self.title_short:
-			a.append(( self.title_short, self.title ))
+		'''
+		indexes() -> list
+
+		список индексов в формате:
+		list(
+			tuple( value, title ),
+			...
+		)
+		'''
+		a = set((( self.title, self.title ),))
+		a.add(( self.title_short, self.title ))
 		return a
 
-	def index( self, value, title ):
+
+
+	def index( value, title ):
+		'''
+		# deprecated!
+
+		index( value, title ) -> u'<d:index …>'
+
+		отставленна на всякий полезный случай
+		'''
+		if value.strip() == u'' or
+			title.strip() == u'':
+			return u''
 		return ur'<d:index d:value="%s" d:title="%s"/>' % ( value, title )

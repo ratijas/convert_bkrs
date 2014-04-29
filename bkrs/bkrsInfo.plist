@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>Ukraine</string>
 	<key>CFBundleDisplayName</key>
-	<string>大БКРС</string>
+	<string>{{CFBundleDisplayName}}</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.ratijas.dictionary.bkrs</string>
+	<string>{{CFBundleIdentifier}}</string>
 	<key>CFBundleName</key>
 	<string>大БКРС</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.61</string>
+	<string>{{CFBundleShortVersionString}}</string>
 	<key>DCSDictionaryCopyright</key>
 	<string>Копилефт (англ. copyleft) (Ɔ) 2014 Ratijas &amp; Mac-J studio</string>
 	<key>DCSDictionaryManufacturerName</key>
@@ -37,7 +37,7 @@
 		<key>tc0</key>
 		<string>5</string>
 		<key>version</key>
-		<string>2</string>
+		<string>3</string>
 	</dict>
 </dict>
 </plist>

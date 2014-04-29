@@ -25,9 +25,11 @@ class ProgressBarController( object ):
 
 	def redraw( self ):
 		# поместить курсор вниз влево
-		print chr( 0x1b ) + ( "[%sC" % self.term_width ) + (chr( 0x1b ) + "[K"),
+		print chr( 0x1b ) + "[%dD" % self.term_width,
 		# нарисовать
-		print self.progressBar.__str__(),
+		print self.progressBar.__str__()
+		# вернуть курсор
+		print chr( 0x1b ) + "[1A",
 
 	def set_value( self, value ):
 		self.progressBar.set_value( value )

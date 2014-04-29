@@ -53,9 +53,14 @@ class dslDictionary( object ):
 		else:
 			self.entry = entry_instance
 
+		print u'подсчитываю кол-во статей...'
+
 		self.entries_count = 0
-		f = os.popen( "grep -c -e '^$' '%s'" % self.infile.name )
-		self.entries_count = int( f.read()) - 1	# как правило, их оказывается на одну меньше
+		f = os.popen( "grep -c -e '^\s*$' '%s'" % self.infile.name )
+		self.entries_count = int( f.read()) - 1	# как правило, число на один больше, чем надо
+		if self.entries_count < 1:
+			print u'не удалось подсчитать кол-во статей =('
+			self.entries_count = 1
 		f.close()
 		self.progress_drawer = progress_bar.ProgressBarController( 0, self.entries_count )
 		# конец __init__
@@ -105,13 +110,14 @@ class dslDictionary( object ):
 			self.outfile.write( utf( _ ) )
 
 		# напечатать все статьи
-		self._print_entries()
+		cnt = self._print_entries()
 
 		# припечатать outro в конце. </d:dictionary>, например
 		if self.plugin:
 			_ = self.plugin.dictionary_end()
 			self.outfile.write( utf( _ ))
 
+		return cnt
 		# конец convert
 
 
@@ -143,12 +149,11 @@ class dslDictionary( object ):
 
 			writen += 1
 			if writen % 10 == 0:
-				self.statistic( writen )
 				self.progress_drawer.set_value( writen )
 
 		self.progress_drawer.set_value( writen )
-		print u'обработано %d статей' % writen
-		# конец _print_entries
+		print
+		# print u'обработано %d статей' % writen
 
-	def statistic( self, writen ):
-		print u'#% 6d: %s' % ( writen, self.entry.title )
+		return writen
+		# конец _print_entries

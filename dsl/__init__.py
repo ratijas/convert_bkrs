@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from dsl_dictionary import *
-from dsl_entry import *
+from dsl_dictionary        import dslDictionary
+from dsl_dictionary_plugin import dslDictionaryPlugin
+from dsl_entry        import dslEntry
+from dsl_entry_plugin import dslEntryPlugin
+
+import time
+from format_time_report import format_time_report
+
 
 #########################
 DEBUG_MODE = False		#
@@ -35,6 +41,10 @@ def set_app_data( data ):
 
 
 def convert():
+	time_begin = time.time()
+	time_init  = None
+	time_end   = None
+
 	e = dslEntry(
 		plugin = app_data[ ENTRY_PLUGIN_CLASS ]()
 	)
@@ -46,4 +56,9 @@ def convert():
 		entry_instance = e
 	)
 
-	d.convert()
+	time_init = time.time()
+
+	cnt = d.convert()
+
+	time_end = time.time()
+	format_time_report( time_begin, time_init, time_end, cnt )

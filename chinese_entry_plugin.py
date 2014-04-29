@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from apple_entry_plugin import AppleEntryPlugin
+import color
 
 class ChineseEntryPlugin( AppleEntryPlugin ):
 	"""

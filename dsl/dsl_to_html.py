@@ -18,6 +18,7 @@ def dsl_to_html():
 			( u'[b]', u'<b>' ),
 			( u'[/b]', u'</b>' ),
 			( u'[c][i]', u'[i][c]' ),
+			( u'[/i][/c]', u'[/c][/i]' ),
 			( u'[i]', u'<i>' ),
 			( u'[/i]', u'</i>' ),
 			( u'[c]', u'<span class="green">' ),
@@ -84,6 +85,11 @@ def dsl_to_html():
 
 			# попарсить дерево
 			tree = etree.parse( StringIO( text ), parser )
+
+			# будет не совсем красиво, зато ничего не сломается
+			els = tree.xpath('span/div') + tree.xpath('i/div') + tree.xpath('b/div')
+			for el in els:
+			    el.tag = 'span'
 
 			# распечатать в unicode, иначе -- куча багов
 			text = etree.tostring( tree, encoding='unicode', xml_declaration=False )

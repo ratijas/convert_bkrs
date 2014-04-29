@@ -11,7 +11,7 @@ def run( filename ):
 	pipe = None
 	args = [ 'java', '-jar', jing_jar_path, rng_path, filename ]
 
-	print u'запускаю `jing` тест:\n%s' % u' '.join( args )
+	print u'запускаю `jing` тест:\n' '%s\n...' % u' '.join( args )
 	pipe = subprocess.Popen(
 		args,
 		stdout=subprocess.PIPE )

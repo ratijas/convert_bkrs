@@ -53,7 +53,7 @@ class dslEntry( object ):
 		# читать до пустой строки или EOF
 		while True:
 			line = u( f.readline())
-			if line not in (u'\n', u''):
+			if line.strip() is not u'':
 				self.entry += line
 			else:
 				break
@@ -82,10 +82,7 @@ class dslEntry( object ):
 		if self.plugin:
 			content = self.plugin.postparse( t, e )
 		else:
-			content = ur'%s\n%s' % ( t, e )
-
-		# убрать оставшуюся экранизацию с квадратных скобок
-		content = content.replace( ur'\[', u'[' ).replace( ur'\]', u']' )
+			content = ur'%s%s' % ( t, e )
 
 		self.content = content
 		return self
