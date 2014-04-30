@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>Ukraine</string>
+	<string>{{DevelopmentRegion}}</string>
 	<key>CFBundleDisplayName</key>
-	<string>{{CFBundleDisplayName}}</string>
+	<string>{{BundleDisplayName}}</string>
 	<key>CFBundleIdentifier</key>
-	<string>{{CFBundleIdentifier}}</string>
+	<string>{{BundleIdentifier}}</string>
 	<key>CFBundleName</key>
-	<string>大БКРС</string>
+	<string>{{BundleName}}</string>
 	<key>CFBundleShortVersionString</key>
-	<string>{{CFBundleShortVersionString}}</string>
+	<string>{{BundleShortVersionString}}</string>
 	<key>DCSDictionaryCopyright</key>
 	<string>Копилефт (англ. copyleft) (Ɔ) 2014 Ratijas &amp; Mac-J studio</string>
 	<key>DCSDictionaryManufacturerName</key>
@@ -19,9 +19,9 @@
 	<key>DCSDictionaryFrontMatterReferenceID</key>
 	<string>front_back_matter</string>
 	<key>DCSDictionaryPrefsHTML</key>
-	<string>bkrs_prefs.html</string>
+	<string>{{prefs_filename}}</string>
 	<key>DCSDictionaryXSL</key>
-	<string>bkrs.xsl</string>
+	<string>{{xsl_filename}}</string>
 	<key>DCSDictionaryDefaultPrefs</key>
 	<dict>
 		<key>color_mode</key>

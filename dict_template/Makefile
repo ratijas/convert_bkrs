@@ -8,10 +8,10 @@
 
 # You need to edit these values.
 
-DICT_NAME		=	"{{dict}}"
-DICT_SRC_PATH	=	"{{xml}}"
-CSS_PATH		=	"{{css}}"
-PLIST_PATH		=	"{{plist}}"
+DICT_NAME		=	"{{BundleDisplayName}}"
+DICT_SRC_PATH	=	"dict.xml"
+CSS_PATH		=	"dict.css"
+PLIST_PATH		=	"dict.plist"
 
 DICT_BUILD_OPTS		=
 # Suppress adding supplementary key.
