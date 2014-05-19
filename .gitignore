@@ -6,15 +6,16 @@ objects_bruks/*
 *.pyc
 
 # игнорировать сгенерированный xml-словарь
-bruks.xml
-brks.xml
-bkrs.xml
+*/bruks.xml
+*/brks.xml
+*/bkrs.xml
+*/bkrs[123].xml
 
 # игнорировать исходный словарь. его последнюю версию можно загрузить с сайта bkrs.info
 *.dsl
 
 # игнорировать паку со сжатыми сконвертированными словарями
-/final/
+**/final/
 
 # sublime text'овские файлы
 *.sublime-project

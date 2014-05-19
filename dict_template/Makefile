@@ -8,7 +8,7 @@
 
 # You need to edit these values.
 
-DICT_NAME		=	"{{BundleDisplayName}}"
+DICT_NAME		=	"{{BundleName}}"
 DICT_SRC_PATH	=	"dict.xml"
 CSS_PATH		=	"dict.css"
 PLIST_PATH		=	"dict.plist"

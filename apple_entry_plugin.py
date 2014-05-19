@@ -114,7 +114,7 @@ class AppleEntryPlugin( dslEntryPlugin ):
 
 		отставленна на всякий полезный случай
 		'''
-		if value.strip() == u'' or
+		if value.strip() == u'' or \
 			title.strip() == u'':
 			return u''
 		return ur'<d:index d:value="%s" d:title="%s"/>' % ( value, title )

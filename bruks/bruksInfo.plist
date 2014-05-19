@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>Ukraine</string>
+	<string>{{DevelopmentRegion}}</string>
 	<key>CFBundleDisplayName</key>
-	<string>大БРуКС</string>
+	<string>{{BundleDisplayName}}</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.ratijas.dictionary.bruks</string>
+	<string>{{BundleIdentifier}}</string>
 	<key>CFBundleName</key>
-	<string>大БРуКС</string>
+	<string>{{BundleName}}</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.60</string>
+	<string>{{BundleShortVersionString}}</string>
 	<key>DCSDictionaryCopyright</key>
 	<string>Копилефт (англ. copyleft) (Ɔ) 2014 Ratijas &amp; Mac-J studio</string>
 	<key>DCSDictionaryManufacturerName</key>
@@ -19,9 +19,9 @@
 	<key>DCSDictionaryFrontMatterReferenceID</key>
 	<string>front_back_matter</string>
 	<key>DCSDictionaryPrefsHTML</key>
-	<string>bruks_prefs.html</string>
+	<string>{{PrefsHTML}}</string>
 	<key>DCSDictionaryXSL</key>
-	<string>bruks.xsl</string>
+	<string>{{XSL}}</string>
 	<key>DCSDictionaryDefaultPrefs</key>
 	<dict>
 		<key>color_mode</key>

@@ -8,6 +8,7 @@ import os
 import shutil
 
 OtherResources = 'OtherResources'
+dirpath = os.path.dirname(__file__) + '/'
 
 def clean_folder( folder_path ):
 	try:
@@ -57,47 +58,53 @@ def run(
 	images_dir		= None
 	):
 	
-	# папка, куда запишем файлы словаря
-	clean_folder( bundle_name )
 
 	# файлы из шаблона
-	plist_filename	= plist_filename or 'dict.plist'
-	prefs_filename	= prefs_filename or 'dict.html'
-	xsl_filename	= xsl_filename or	'dict.xsl'
-	css_filename	= css_filename or	'dict.css'
+	plist_filename	= plist_filename or ( dirpath + 'dict.plist' )
+	prefs_filename	= prefs_filename or ( dirpath + OtherResources + '/dict.html' )
+	xsl_filename	= xsl_filename   or ( dirpath + OtherResources + '/dict.xsl' )
+	css_filename	= css_filename   or ( dirpath + 'dict.css' )
 
 	# параметры замены
 	replaces = {
 		'BundleDisplayName':	display_name,
-		'BundleIdentifier':	identifier,
+		'BundleIdentifier':		identifier,
 		'DevelopmentRegion':	'Ukraine',
 		'BundleName':			bundle_name,
 		'BundleShortVersionString':	version_string,
-		'prefs_filename':		prefs_filename,
-		'xsl_filenamexsl_filename':			xsl_filename,
-		'Dictionary Development Kit':	'../Dictionary Development Kit'
+		'prefs_filename':		'%s/%s' % ( OtherResources, 'dict.html' ),
+		'xsl_filename':			'%s/%s' % ( OtherResources, 'dict.xsl' ),
+		'Dictionary Development Kit':		'../../Dictionary Development Kit',
+		'PrefsHTML':			'dict.html',
+		'XSL':					'dict.xsl'
 	}
+
+	bundle_name = 'final/%s' % bundle_name
+	# папка, куда запишем файлы словаря
+	clean_folder( bundle_name )
 
 	# xml
 	if xml_filename and os.path.isfile( xml_filename ):
-		shutil.move( xml_filename, '%s/%s' % ( bundle_name, 'dict.xml' ))
+		shutil.copy( xml_filename, '%s/%s' % ( bundle_name, 'dict.xml' ))
+	else:
+		raise ValueError( 'template: run: обязательно нужен xml файл!' )
 
-	# установки
+	# plist
 	plist = read_from( plist_filename )
 	write_to(
 		'%s/%s' % ( bundle_name, 'dict.plist' ),
 		templatize( plist, replaces )
 		)
 
-	# страница настроек
-	prefs = read_from( '%s/%s' % ( OtherResources, prefs_filename ))
+	# страница настроек html
+	prefs = read_from( prefs_filename )
 	write_to(
 		'%s/%s/%s' % ( bundle_name, OtherResources, 'dict.html' ),
 		templatize( prefs, replaces )
 	)
 
 	# xsl
-	xsl = read_from( '%s/%s' % ( OtherResources, xsl_filename ))
+	xsl = read_from( xsl_filename )
 	write_to(
 		'%s/%s/%s' % ( bundle_name, OtherResources, 'dict.xsl' ),
 		templatize( xsl, replaces )
@@ -119,7 +126,7 @@ def run(
 
 	# makefile
 	Makefile = 'Makefile'
-	make = read_from( Makefile )
+	make = read_from( '%s/%s' % ( os.path.dirname( __file__ ), Makefile ))
 	write_to(
 		'%s/%s' % ( bundle_name, Makefile ),
 		templatize( make, replaces )
@@ -129,12 +136,12 @@ def run(
 def main():
 	run(
 		# plist_filename	= 'test.plist',
-		xml_filename	= '../bkrs1.xml',
+		xml_filename	= '../bkrs/bkrs1.xml',
 		plist_filename	= None,
 		prefs_filename	= None,
 		xsl_filename	= None,
 		css_filename	= None,
-		images_dir		= '/Volumes/DataHD/users/ivan/Documents/convert_bkrs/both/OtherResources/Images',
+		images_dir		= '../both/OtherResources/Images',
 		display_name	= 'testing dict',
 		identifier		= 'com.ratijas.dict.test',
 		bundle_name		= 'test bundle name',

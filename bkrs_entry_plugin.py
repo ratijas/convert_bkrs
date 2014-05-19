@@ -13,11 +13,10 @@ class BkrsEntryPlugin( ChineseEntryPlugin ):
 
 	def preparse( self, t, s ):
 		t, s = super( BkrsEntryPlugin, self ).preparse( t, s )
-		lines = s.split( u'\n' )
-		self.pinyin = lines[ 0 ] = lines[ 0 ].strip()
-		lines[ 0 ] = u'<div class="py">%s</div>' % lines[ 0 ]
-		s = u' '.join( lines )
-		return t, s
+		i = s.find( u'\n' )
+		# сохранить пиньинь для индекса
+		self.pinyin = s[ :i ].strip()
+		return t, u'<div class="py">%s</div>%s' % ( self.pinyin, s[ i: ])
 
 	def indexes( self ):
 		'''
@@ -30,7 +29,7 @@ class BkrsEntryPlugin( ChineseEntryPlugin ):
 		s = self.title
 
 		# фича: ставишь точку в конце -> словарь ищет точное совпадение
-		a = set([ ( i[ 0 ]+u'.', i[ 1 ] ) for i in a ])
+		a = set([ ( i[ 0 ]+u'。', i[ 1 ] ) for i in a ])
 
 		# вырезать всё, что не иероглиф
 		s = re.sub( ur'[^\u4e00-\u9fff]', u'', s )

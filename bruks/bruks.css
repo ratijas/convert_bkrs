@@ -5,36 +5,28 @@ d|entry {
 }
 
 body {
-	padding-top: 10pt;
+	display: block;
+	padding: 0em 0em 1.0em 0em;
+	font-family: arial, sans-serif;
+	font-size: 10pt;
+	line-height: 1.5em;
 }
 
-* {
+br {
+	display: none;
+}
+
+.ru, h1 {
+	display: block;
+
 	font-family: arial, sans-serif;
 	font-size: 100%;
-}
-
-.ch {
-	display: block;
-	font-family: 'arial unicode MS', sans-serif, arial;
-	font-size: 125% !important;
-	margin-bottom: 8pt;
-}
-
-h2 {
-	font-size: 125%;
-}
-
-h3	{
-	font-size: 100%;
+	font-weight: bold;
+	line-height: 1em;
 }
 
 .i, .p {
 	font-style: italic;
-}
-
-.ln {
-	text-decoration: underline;
-	color: #008;
 }
 
 e, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
@@ -42,24 +34,27 @@ e, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
 }
 
 .m1 {
-	margin-left: 1em;
+	margin-left: 0em;
 }
 
 .m2 {
-	margin-left: 2em;
+	margin-left: 1em;
 }
 
 .m3 {
-	margin-left: 3em;
+	margin-left: 1.5em;
 }
 
-.m4, .m5, .m6, .m7, .m8, .m9 {
-	margin-left: 4em;
+.m4 {
+	margin-left: 2em;
+}
+
+.m5, .m6, .m7, .m8, .m9 {
+	margin-left: 2.5em;
 }
 
 .e {
 	color: #666;
-	margin-left: 1em;
 }
 
 .c, .p {

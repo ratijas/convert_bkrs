@@ -35,9 +35,10 @@ class BruksEntryPlugin( ChineseEntryPlugin ):
 		'''
 		# type( a ) is set == True
 		a = super( BruksEntryPlugin, self ).indexes()
-				
-		a.add(( self.title, self.title ))
 
+		# фича: ставишь точку в конце -> словарь ищет точное совпадение
+		a = set([ ( i[0]+u'.', i[1] ) for i in a ] + list( a ))
+				
 		# склоняем только карточки из одного слова
 		if len( self.title.split()) == 1:
 
@@ -50,9 +51,6 @@ class BruksEntryPlugin( ChineseEntryPlugin ):
 				
 				for x in normal_form.lexeme:
 					a.add(( x.word, self.title ))
-
-		# фича: ставишь точку в конце -> словарь ищет точное совпадение
-		a = set([ ( i[ 0 ]+u'.', i[ 1 ] ) for i in a ])
 
 		return a
 		# конец indexes

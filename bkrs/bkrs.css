@@ -2,40 +2,39 @@
 @namespace d url(http://www.apple.com/DTDs/DictionaryService-1.0.rng);
 
 d|entry {
-	display: block;
-	margin: 0em 0em 1.0em 0em;
 }
 
 body {
-	margin-right: 1em;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	display: block;
+	padding: 0em 0em 1.0em 0em;
+
 	font-family: arial, sans-serif;
-	font-size: 12pt;
+	font-size: 10pt;
 	line-height: 1.5em;
+}
+
+br {
+	display: none;
 }
 
 .ch, .py, h1 {
 	line-height: 1em;
 }
 
-.ch {
+.ch, h1 {
 	display: block;
+
 	font-family:"KaiTi,simsun,Nsimsun,STKaiti,STSong,arial unicode MS, sans-serif,arial";
-	font-size: 18pt;
-	/*margin-bottom: 8pt;*/
+	font-size: 120%;
+	font-weight: normal;
+	line-height: 1em;
 }
 
 .py {
 	display: block;
-	font-size: 17pt;
-	margin: 0.2em 0em;
-	margin-bottom: 10pt;
-}
-
-h1 {
-	font-size: 18pt;
-	font-weight: normal;
+	font-size: 10pt;
+	margin-top: -3pt;
+	margin-bottom: 5pt;
 }
 
 .i, .p {
