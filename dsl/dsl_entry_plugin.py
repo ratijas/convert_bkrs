@@ -2,12 +2,13 @@
 # -*- coding: UTF-8 -*-
 
 from u import *
-import re
-from urllib import quote
 
 class dslEntryPlugin( object ):
 	"""
-	абстрактный класс, определяет методы, которые нужно переопределить
+	абстрактный класс, определяет методы, которые нужно переопределить:
+
+	preparse( t, s ) -> ( t, s )
+	postparse( t, s ) -> str
 	"""
 	def __init__( self ):
 		super( dslEntryPlugin, self ).__init__()
@@ -16,8 +17,4 @@ class dslEntryPlugin( object ):
 		return t, s
 
 	def postparse( self, t, s ):
-		return u'%s%s' % ( t, s )
-
-
-if __name__ == '__main__':
-	pl = dslEntryPlugin()
+		return u'%s%s' % ( u( t ), u( s ) )

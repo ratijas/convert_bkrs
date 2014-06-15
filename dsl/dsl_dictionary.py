@@ -57,7 +57,7 @@ class dslDictionary( object ):
 
 		self.entries_count = 0
 		f = os.popen( "grep -c -e '^\s*$' '%s'" % self.infile.name )
-		self.entries_count = int( f.read()) - 1	# как правило, число на один больше, чем надо
+		self.entries_count = int( f.read())
 		if self.entries_count < 1:
 			print u'не удалось подсчитать кол-во статей =('
 			self.entries_count = 1
@@ -80,11 +80,11 @@ class dslDictionary( object ):
 				_ = re.match(
 					# #INDEX_LANGUAGE "Russian"
 					# #      \w+    \s " .+  "
-					ur'#(\w+)\s+("?)(.+)\2',
+					ur'#(\w+)\s+([\'"]?)([^\n]+?)\2',
 					self.last_read,
 					re.UNICODE
 				)
-				if _ is not None:
+				if _:
 					# \1 -- имя, \3 -- значение
 					_ = _.groups()
 					headers.append({ 'title': _[0], 'value': _[2] })
@@ -92,6 +92,8 @@ class dslDictionary( object ):
 				else:
 					break
 			else:
+				# положить обратно где взял
+				self.infile.seek( - len( self.last_read ), 1 )
 				break
 
 		return headers
@@ -135,15 +137,15 @@ class dslDictionary( object ):
 			# следующий
 			_ = self.entry.read( self.infile )
 
-			# признак окончания файла?
-			if _ is None:
+			# признак окончания файла или другой проблемы?
+			if not _:
 				break
 
 			# идём дальше
 			self.entry.parse()
 
 			# вывод в файл
-			out = utf( self.entry.__str__())
+			out = utf( self.entry )
 
 			self.outfile.write( out + '\n' )
 
@@ -152,8 +154,8 @@ class dslDictionary( object ):
 				self.progress_drawer.set_value( writen )
 
 		self.progress_drawer.set_value( writen )
+		# новая строка после ползунка
 		print
-		# print u'обработано %d статей' % writen
 
 		return writen
 		# конец _print_entries

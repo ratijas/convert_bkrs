@@ -5,7 +5,7 @@ import dsl
 from dsl import jing_test
 from ratijas_dictionary_plugin import RatijasDictionaryPlugin
 from bkrs_entry_plugin import BkrsEntryPlugin
-from dict_template import template
+import dict_template
 
 import sys, getopt
 
@@ -34,7 +34,7 @@ for part in parts:
 
 	jing_test.run( OUTFILE )
 
-	template.run(
+	dict_template.run(
 		xml_filename	= OUTFILE,
 		plist_filename	= 'bkrs/bkrsInfo.plist',
 		prefs_filename	= 'both/prefs.html',

@@ -5,7 +5,7 @@ import dsl
 from dsl import jing_test
 from ratijas_dictionary_plugin import RatijasDictionaryPlugin
 from bruks_entry_plugin import BruksEntryPlugin
-from dict_template import template
+import dict_template
 
 
 INFILE = 'bruks/bruks.dsl'
@@ -22,7 +22,7 @@ dsl.convert()
 
 jing_test.run( OUTFILE )
 
-template.run(
+dict_template.run(
 	xml_filename	= OUTFILE,
 	plist_filename	= 'bruks/bruksInfo.plist',
 	prefs_filename	= 'both/prefs.html',

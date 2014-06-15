@@ -6,11 +6,31 @@ from dsl import dslEntryPlugin
 from dsl.u import u, utf
 from dsl import normalize
 
+import string
+digs = string.digits + string.lowercase
+
+def int2base( x, base = 10 ):
+	if x < 0:
+		sign = -1
+	elif x == 0:
+		return '0'
+	else:
+		sign = 1
+	x *= sign
+	digits = []
+	while x:
+		digits.append( digs[ x % base ] )
+		x /= base
+	if sign < 0:
+		digits.append( '-' )
+	digits.reverse()
+	return ''.join( digits )
+
 
 def get_id_for_header():
 	cnt = [0]
 	def get_id_for_header( header ):
-		s = u'_%d' % cnt[0]
+		s = u'_%s' % int2base( cnt[0], 36 )
 		cnt[0] += 1
 		return s
 	return get_id_for_header

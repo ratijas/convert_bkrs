@@ -2,12 +2,12 @@
 # -*- coding: UTF-8 -*-
 
 from dsl_entry_plugin import dslEntryPlugin
-from u import *
+from u import u, utf
 import normalize
 from dsl_to_html import dsl_to_html
 
 class dslEntry( object ):
-	"""
+	'''
 	dslEntry( plugin )
 
 	класс для считывания ( read() ), преобразования ( parse() )
@@ -15,7 +15,7 @@ class dslEntry( object ):
 	пригоден для многоразового использования
 
 	ВНИМАНИЕ: метод __str__ возвращает unicode!
-	"""
+	'''
 	def __init__( self, plugin=None ):
 		super( dslEntry, self ).__init__()
 
@@ -23,11 +23,9 @@ class dslEntry( object ):
 		self.title = u''
 		self.content = u''
 
-		self.plugin = None
 		if plugin and not isinstance( plugin, dslEntryPlugin ):
 			raise TypeError( 'dslEntry: `plugin` должен быть подкласом dslEntryPlugin' )
-		else:
-			self.plugin = plugin
+		self.plugin = plugin
 
 		# конец __init__()
 
@@ -38,7 +36,19 @@ class dslEntry( object ):
 
 		предполагается, что статьи разделны хотя бы одной пустой строкой
 		в случае неудачи (например, EOF) возвращает None
+		
+		может делегировать вызов плагину
+		self.plugin.read( f )
+			-> tuple( title, entry )
+			-> None // в случае неудачи
 		'''
+		if hasattr( self.plugin, 'read' ):
+			_ = self.plugin.read( f )
+			if _:
+				self.title, self.entry = _[ 0 ], _[ 1 ].strip()
+				return self
+			return None
+
 		self.title = u''
 		# пропустить пустые строки
 		while True:
@@ -47,7 +57,7 @@ class dslEntry( object ):
 				self.title = _.strip()
 				break
 
-		# print u'dslEntry.read: прочитал "%s"' % self.title
+		# print u'dslEntry.read: прочитал заголовок "%s"' % self.title
 
 		self.entry = u''
 		# читать до пустой строки или EOF
@@ -66,13 +76,12 @@ class dslEntry( object ):
 
 
 	def parse( self ):
-		# print u'пáршу статью с заголовком "%s"' % self.title
 		t, e = self.title, self.entry
 
-		# экранизировать угловые скобки
-		e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
 		# полный вариант заголовка со скобками
 		t = normalize.brackets( t )
+		# экранизировать угловые скобки
+		e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
 
 		if self.plugin:
 			t, e = self.plugin.preparse( t, e )
@@ -105,7 +114,7 @@ class dslEntry( object ):
 
 
 	def __str__( self ):
-		return self.content
+		return utf( self.content )
 
 
 if __name__ == '__main__':
