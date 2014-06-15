@@ -27,6 +27,9 @@ class dslEntry( object ):
 			raise TypeError( 'dslEntry: `plugin` должен быть подкласом dslEntryPlugin' )
 		self.plugin = plugin
 
+		if hasattr( self.plugin, 'escapeXML' ):
+			self.escapeXML = self.plugin.escapeXML
+
 		# конец __init__()
 
 
@@ -81,7 +84,8 @@ class dslEntry( object ):
 		# полный вариант заголовка со скобками
 		t = normalize.brackets( t )
 		# экранизировать угловые скобки
-		e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
+		if self.escapeXML:
+			e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
 
 		if self.plugin:
 			t, e = self.plugin.preparse( t, e )
@@ -104,7 +108,7 @@ class dslEntry( object ):
 		'''
 
 		title = normalize.full( title )
-		title = ur'<h1>%s</h1>' % title
+		title = ur'<h1>%s</h1>' % title if title != u'' else u''
 		# print u'_parse: title = "%s"' % title
 
 		entry = dsl_to_html( entry ).strip()

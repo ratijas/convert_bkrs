@@ -80,7 +80,7 @@ def step2():
 
 	def step2( text ):
 		# обернуть
-		text = u'%s%s%s' % ( body_start, text, body_end )
+		text = u'%s%s%s' % ( body_start, text.replace( u'&', u'&amp;' ), body_end )
 
 		# создать парсер
 		parser = etree.XMLParser( recover=True, encoding="ascii" )

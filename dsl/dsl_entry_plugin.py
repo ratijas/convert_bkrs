@@ -12,6 +12,7 @@ class dslEntryPlugin( object ):
 	"""
 	def __init__( self ):
 		super( dslEntryPlugin, self ).__init__()
+		self.escapeXML = True
  		
 	def preparse( self, t, s ):
 		return t, s

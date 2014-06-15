@@ -104,7 +104,10 @@ class AppleEntryPlugin( dslEntryPlugin ):
 								if value.strip() != u'' and title.strip() != u''
 						]),
 					header	= t,
-					content	= href_re.sub( ur'href="x-dictionary:d:\1"', s )
+					content	= href_re.sub(
+						lambda x: x.group() if x.groups()[0].startswith( 'http' ) else ur'href="x-dictionary:d:%s"' % x.groups()[0],
+						s
+					)
 				)
 			# конец postparse
 		return postparse

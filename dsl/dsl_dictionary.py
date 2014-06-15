@@ -58,7 +58,9 @@ class dslDictionary( object ):
 		self.entries_count = 0
 		f = os.popen( "grep -c -e '^\s*$' '%s'" % self.infile.name )
 		self.entries_count = int( f.read())
-		if self.entries_count < 1:
+		if self.entries_count > 0:
+			print u'\t->%d' % self.entries_count
+		else:
 			print u'не удалось подсчитать кол-во статей =('
 			self.entries_count = 1
 		f.close()
