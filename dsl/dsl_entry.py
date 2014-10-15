@@ -14,7 +14,8 @@ class dslEntry( object ):
 	и записи ( str() ) словарной статьи.
 	пригоден для многоразового использования
 
-	ВНИМАНИЕ: метод __str__ возвращает unicode!
+	# ВНИМАНИЕ: метод __str__ возвращает unicode!
+	поправка: _раньше_ возвращал, что приводило к ошибкам вызова str( entry ). теперь возвращает <type 'str'>
 	'''
 	def __init__( self, plugin=None ):
 		super( dslEntry, self ).__init__()
@@ -27,9 +28,6 @@ class dslEntry( object ):
 			raise TypeError( 'dslEntry: `plugin` должен быть подкласом dslEntryPlugin' )
 		self.plugin = plugin
 
-		if hasattr( self.plugin, 'escapeXML' ):
-			self.escapeXML = self.plugin.escapeXML
-
 		# конец __init__()
 
 
@@ -39,7 +37,7 @@ class dslEntry( object ):
 
 		предполагается, что статьи разделны хотя бы одной пустой строкой
 		в случае неудачи (например, EOF) возвращает None
-		
+
 		может делегировать вызов плагину
 		self.plugin.read( f )
 			-> tuple( title, entry )
@@ -60,13 +58,12 @@ class dslEntry( object ):
 				self.title = _.strip()
 				break
 
-		# print u'dslEntry.read: прочитал заголовок "%s"' % self.title
-
 		self.entry = u''
 		# читать до пустой строки или EOF
+		# именно пустой, а не содержащей пробелы
 		while True:
 			line = u( f.readline())
-			if line.strip() is not u'':
+			if line != u'\n' and line != u'':
 				self.entry += line
 			else:
 				break
@@ -77,15 +74,22 @@ class dslEntry( object ):
 		return self
 		# конец read
 
+	def escapeXML( self, s ):
+		return s \
+			.replace( ur'&', ur'&amp;' )	\
+			.replace( ur'<', ur'&lt;' )		\
+			.replace( ur'>', ur'&gt;' )		\
+			.replace( ur'"', ur'&quot;' )	\
 
 	def parse( self ):
 		t, e = self.title, self.entry
 
 		# полный вариант заголовка со скобками
 		t = normalize.brackets( t )
-		# экранизировать угловые скобки
-		if self.escapeXML:
-			e = e.replace( ur'<', ur'&lt;' ).replace( ur'>', ur'&gt;' )
+
+		if self.plugin == None or self.plugin.escapeXML:
+			t = self.escapeXML( t )
+			e = self.escapeXML( e )
 
 		if self.plugin:
 			t, e = self.plugin.preparse( t, e )
@@ -93,11 +97,10 @@ class dslEntry( object ):
 		t, e = self._parse( t, e )
 
 		if self.plugin:
-			content = self.plugin.postparse( t, e )
+			self.content = self.plugin.postparse( t, e )
 		else:
-			content = ur'%s%s' % ( t, e )
+			self.content = ur'%s%s' % ( t, e )
 
-		self.content = content
 		return self
 		# конец parse
 
@@ -109,9 +112,8 @@ class dslEntry( object ):
 
 		title = normalize.full( title )
 		title = ur'<h1>%s</h1>' % title if title != u'' else u''
-		# print u'_parse: title = "%s"' % title
 
-		entry = dsl_to_html( entry ).strip()
+		entry = dsl_to_html( entry )
 
 		return title, entry
 		# конец _parse
@@ -123,10 +125,45 @@ class dslEntry( object ):
 
 if __name__ == '__main__':
 	from io import StringIO
+	# from apple_entry_plugin import AppleEntryPlugin
+	# e = dslEntry( plugin = AppleEntryPlugin() )
 	e = dslEntry()
-	s = u'''бывать{(ся)}
- [m1]бывает ([c][i]прим.[/c] часто встречаются[/i])[/m]'''
-	e.read( StringIO( s ) )
-	e.parse()
 
-	print u'исходный:\n'+s+u'\nрезультат:\n'+e.__str__()
+	testing_entries = [
+		u'''бывать{(ся)}
+ [m1]бывает ([c][i]прим.[/c] часто встречаются[/i])[/m]
+''',
+		u'''статья & ко
+тест <на> эскейпы & скобки''',
+		u'''escapeXML
+здесь мы собираемся заменять символы '<', '>', '&' и '[b]"[/b]'.
+они будут заменены на '&lt;', '&gt;', '&amp;' и '&quot;' соответственно.
+''',
+		u'''
+проверка
+[m1][p]сущ.[/p] от [c][i]гл.[/c][/i] [b]проверять[/b][/m]
+[m1]1) тестирование[/m]
+[m2][ex][*]проверка на вшивость[/*][/ex][/m]
+''',
+		u'''加一点儿[汉语]
+[m1]为的是[ref]看一看[/ref]。[b]一见[/b]复杂的句子，就[ref]吓死[/ref]了。[/m]
+''',
+		u'''ссылки
+[m1]поведение [ref]"ссылок"[/ref] со специальными [url]& знаками[/url][/m]
+''',
+		u'''одинаковые ссылки
+[ref] "tt" [/ref]
+[ref] "dd" [/ref]
+[ref] "tt & dd" [/ref]
+[ref] "dd" & tt [/ref]
+''',
+		u'''R&D计划
+ r&d jìhuà
+ [m1]программа, план исследований и разработок[/m]
+'''
+	]
+
+	for s in testing_entries:
+		e.read( StringIO( s ) )
+		e.parse()
+		print u'исходный:\n' + s + u'\nрезультат:\n' + u( e ) + '\n\n'

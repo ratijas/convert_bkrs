@@ -75,7 +75,6 @@ class AppleEntryPlugin( dslEntryPlugin ):
 
 		def preparse( self, t, s ):
 			# запомнить для postparse
-			t = t.replace( u'"', u'&quot;' )
 			self.title = normalize.full( t )
 			self.title_short = normalize.short( t )
 
@@ -105,7 +104,11 @@ class AppleEntryPlugin( dslEntryPlugin ):
 						]),
 					header	= t,
 					content	= href_re.sub(
-						lambda x: x.group() if x.groups()[0].startswith( 'http' ) else ur'href="x-dictionary:d:%s"' % x.groups()[0],
+						lambda x:											\
+								x.group()									\
+							if x.groups()[0].startswith( 'http' )			\
+							else 											\
+								ur'href="x-dictionary:d:%s"' % x.groups()[0],
 						s
 					)
 				)

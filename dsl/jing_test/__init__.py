@@ -9,7 +9,7 @@ def run( filename ):
 	jing_jar_path	= dirpath + 'jing/bin/jing.jar'
 	rng_path		= dirpath + 'DictionarySchema/AppleDictionarySchema.rng'
 	pipe = None
-	args = [ 'java', '-jar', jing_jar_path, rng_path, filename ]
+	args = [ 'java', '-Xmx4G', '-jar', jing_jar_path, rng_path, filename ]
 
 	print u'запускаю `jing` тест:\n' '%s\n...' % u' '.join( args )
 	pipe = subprocess.Popen(

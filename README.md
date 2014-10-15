@@ -29,7 +29,7 @@ convert-bkrs
 ## зависимости
 
 * python
-* pymorphy2
+	- pymorphy2
 * java
 * curl
 * gunzip

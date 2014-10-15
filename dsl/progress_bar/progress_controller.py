@@ -17,8 +17,8 @@ class ProgressBarController( object ):
 		self.term_width = int( rd[ 1 ])
 		self.term_height = int( rd[ 0 ])
 
-		if width == 0 or width > self.term_width:
-			self.width = self.term_width
+		if width == 0 or width >= self.term_width:
+			self.width = self.term_width - 1
 		else:
 			self.width = width
 		self.progressBar = progress.ProgressBar( min, max, self.width )

@@ -2,6 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 from u import u, utf
+from lxml import etree
+from io import StringIO
+
 
 def dsl_to_html( text ):
 	return step2( step1( u( text ).strip() ))
@@ -10,6 +13,7 @@ def dsl_to_html( text ):
 # шаг 1
 # преобразовать dsl в html с помощью str.replace и re.sub
 
+import urllib
 import re
 
 def step1():
@@ -45,11 +49,26 @@ def step1():
 		( u'[sup]', u'<sup>' ),
 		( u'[/sup]', u'</sup>' )
 	]
+
+	href_replace = lambda x: ur'<a href="%s">%s</a>' % (
+		# у uri своя кодировка, не xml entity
+		# заменим только < и "
+		etree 													\
+			.parse(
+				StringIO( u'<a>%s</a>' % u( x.groups()[ 0 ] ) )	\
+				)												\
+			.getroot()											\
+			.text												\
+			.replace( u'<', u'%3C' )							\
+			.replace( u'"', u'%22' ),
+		x.groups()[0]
+	)
+
 	reg_sub_table = [
 		( ur'\[c (.+?)\]',	ur'<span style="color=\1">' ),
 		( ur'- \[ref\](.+?)\[\/ref\]',	ur'<div class="m2">- [ref]\1[/ref]</div>' ),
-		( ur'\[ref\](.+?)\[\/ref\]',	ur'<a href="\1">\1</a>' ),
-		( ur'\[url\](.+?)\[\/url\]',	ur'<a href="\1">\1</a>' ),
+		( ur'\[ref\](.+?)\[\/ref\]',	href_replace ),
+		( ur'\[url\](.+?)\[\/url\]',	href_replace ),
 		( ur'\[m(\d)\]',	ur'<div class="m\1">' )
 	]
 
@@ -70,20 +89,17 @@ step1 = step1()
 # сделать наш html “правильным” на все 100%
 # с помощью парсера
 
-from lxml import etree
-from io import StringIO
-
 def step2():
 	# нужна оболочка, например <body>, или <z>
 	# без костыля xmlns будет ошибка парсера
 	body_start, body_end = u'<z xmlns:d="d">', u'</z>'
 
+	# создать парсер
+	parser = etree.XMLParser( recover=True, encoding="ascii" )
+
 	def step2( text ):
 		# обернуть
-		text = u'%s%s%s' % ( body_start, text.replace( u'&', u'&amp;' ), body_end )
-
-		# создать парсер
-		parser = etree.XMLParser( recover=True, encoding="ascii" )
+		text = u'%s%s%s' % ( body_start, text, body_end )
 
 		# попарсить дерево
 		tree = etree.parse( StringIO( u( text.encode( 'ascii', 'xmlcharrefreplace' ))), parser )

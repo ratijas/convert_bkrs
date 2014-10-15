@@ -6,7 +6,7 @@ import math
 class ProgressBar( object ):
 	"""графическое представление продвижения прогресса"""
 	def __init__( self, minval, maxval, width ):
-		
+
 		self.minval = minval
 		self.maxval = maxval
 		self.current = self.minval
@@ -24,8 +24,8 @@ class ProgressBar( object ):
 		# максимальная длина крайних значений в виде строк
 		label_width_max = max( len( maxval_as_str ), len( minval_as_str ) )
 
-		# ширина ползунка = ширина - ширина меток  - “ [” ... “] ” - “>” - 1 ( на всякий случай )
-		active_width = self.width - ( label_width_max * 2 ) - 4 - 1 - 1
+		# ширина ползунка = ширина     -     ширина меток        - “ [”…“] ” - “>”
+		active_width      = self.width - ( label_width_max * 2 ) -     4     -  1
 
 		# label_current точно в диапазоне [ self.minval ; self.maxval ]
 		label_current = float( self.current )
@@ -40,10 +40,10 @@ class ProgressBar( object ):
 		return u'%*d [%s>%s] %*d' % (
 			label_width_max,
 			label_current,
-			# 
+			#
 			u'=' * yes_width,
 			u' ' * no_width,
-			# 
+			#
 			label_width_max,
 			self.maxval
 		)
