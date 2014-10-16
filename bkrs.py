@@ -11,6 +11,7 @@ import dict_template
 
 INFILE = 'bkrs/bkrs.dsl'
 OUTFILE = 'bkrs/bkrs.xml'
+VERSION = open('downloads/version.txt').read().strip()
 
 ## только выбранные части, или все
 #parts = []
@@ -54,6 +55,6 @@ dict_template.run(
 	display_name	= '大БКРС', # % ( ' ч.%s/3' % part if part else '' ),
 	identifier		= 'com.ratijas.dictionary.bkrs', # % part,
 	bundle_name		= '大БКРС', # % ( ' %s' % part if part else '' ),
-	version_string	= 'v63 (2014.09.30)' # % ( '-%s/3' % part if part else '' )
+	version_string	= VERSION # 'v63 (2014.09.30)' # % ( '-%s/3' % part if part else '' )
 	)
 

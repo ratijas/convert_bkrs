@@ -11,6 +11,7 @@ import dict_template
 
 INFILE = 'bruks/bruks.dsl'
 OUTFILE = 'bruks/bruks.xml'
+VERSION = open('downloads/version.txt').read().strip()
 
 if not ( len( sys.argv ) > 1 and sys.argv[ 1 ] == '-t' ):
 
@@ -37,5 +38,5 @@ dict_template.run(
 	display_name	= 'БРуКС',
 	identifier		= 'com.ratijas.dictionary.bruks',
 	bundle_name		= 'БРуКС',
-	version_string	= 'v63 (2014.09.30)'
+	version_string	= VERSION # 'v63 (2014.09.30)'
 	)

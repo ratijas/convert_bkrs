@@ -9,6 +9,7 @@ FILE1=
 FILE2=
 BKRS_DSL="bkrs.dsl"
 BRUKS_DSL="bruks.dsl"
+VERSION_TXT="version.txt"
 
 clean()
 {
@@ -50,6 +51,7 @@ sed -E "s/^.*href='(.*)'.*$/\\1\\
 sort -u |            #убрать лишние пустые строки и повторы
 grep '\.gz' |        #убрать оставшуюся пустую строку
 grep -v 'examples' | #убрать примеры
+tee "$VERSION_TXT" | #потом вытянуть версию
 sed 'i\
 http://bkrs.info/' | #относительный url -> абсолютный url
 cat > "$URL_FILE" || #временно сохранить ссылки
@@ -65,6 +67,11 @@ error "не удаётся найти ссылки на словарные ба�
 
   FILE_GZ1="${URL1##*/}"
   FILE_GZ2="${URL2##*/}"
+
+  head -n 1 $VERSION_TXT |
+  sed -E 's/^.*([[:digit:]]{6}).*$/v\1/' > "$VERSION_TXT.1"
+
+  mv "$VERSION_TXT.1" "$VERSION_TXT"
 }
 
 download()
