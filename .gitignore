@@ -1,7 +1,3 @@
-# игнорировать папку objects. она создаётся во время сборки словаря
-objects_bkrs/*
-objects_bruks/*
-
 # игнорировать бинарники питона
 *.pyc
 
@@ -26,3 +22,7 @@ objects_bruks/*
 # sublime text'овские файлы
 *.sublime-project
 *.sublime-workspace
+
+# vim backups
+.*.swp
+

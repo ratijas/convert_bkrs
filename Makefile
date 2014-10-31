@@ -5,62 +5,46 @@
 #
 
 ###########################
-LOG = "log.log"
 
-download:
-	./get_last_dicts.sh | tee $(LOG); \
-        log 'download completed';
+LOG = | tee -a log.log
+
+define separator
+	@echo '\n================================================================================' $(LOG)
+endef
+
+all:
+	$(call separator)
+	@echo 'making all' $(LOG)
+	@make download
+	@make bruks
+	@make bkrs
 
 bkrs: download
-	log(){ date >>$(LOG); echo -e $* >> $(LOG);}; \
-        error(){ date >> $(LOG); echo -e $* >> $(LOG); exit 1;}; \
-	\
-        log 'converting bkrs'; \
-        ./bkrs.py && \
-        cd "final/大БКРС" && \
-        make | tee $(LOG) || \
-        error 'converting bkrs failed'; \
-        \
-        log 'done';
+	$(call separator)
+	@( date; echo 'starting making bkrs'; )  $(LOG)
+	@( ./bkrs.py  && cd final/大БКРС/  && make; )  $(LOG)
+	@( date; echo 'done with bkrs'; )  $(LOG)
 
 bruks: download
-	log(){ date >>$(LOG); echo -e $* >> $(LOG);}; \
-        error(){ date >> $(LOG); echo -e $* >> $(LOG); exit 1;}; \
-	\
-        log 'converting bruks';\
-        \
-        ./bruks.py && \
-        cd "final/БРуКС/" && \
-        make | tee $(LOG) || \
-        error 'converting bruks failed'; \
-        \
-	log 'done';
+	$(call separator)
+	@( date; echo 'starting making bruks'; )  $(LOG)
+	@( ./bruks.py  && cd final/БРуКС/  && make; )  $(LOG)
+	@( date; echo 'done with bkrs'; )  $(LOG)
 
-all: download bruks bkrs
-	log(){ date >>$(LOG); echo -e $* >> $(LOG);}; \
-	error(){ date >> $(LOG); echo -e $* >> $(LOG); exit 1;}; \
-	\
-	log 'starting making target `all`';
+download:
+	$(call separator)
+	@( date; echo 'downloading sources'; )  $(LOG)
+	@./get_last_dicts.sh  $(LOG)
+	@( date; echo 'download completed'; )  $(LOG)
 
 install:
-	echo -e "`date`\n""installing all dictionaries for current user" >> $(LOG)
+	@( date; echo 'installing all dictionaries for current user'; )  $(LOG)
 	#
-	cd "final/БРуКС/" && \
-	make install | tee $(LOG)
+	@( cd "final/БРуКС/" && \
+	make install; )  $(LOG)
 	#
-	cd "final/大БКРС" && \
-	make install | tee $(LOG)
+	@( cd "final/大БКРС" && \
+	make install; )  $(LOG)
 	#
-	echo -e "`date`\n""done" >> $(LOG)
-
-install-all:
-	echo -e "`date`\n""installing all dictionaries all users" >> $(LOG)
-	#
-	cd "final/БРуКС/" && \
-	cp -pPR "БРуКС.dictionary" /Library/Dictionaries/
-	#
-	cd "final/大БКРС/" && \
-	cp -pPR "大БКРС.dictionary" /Library/Dictionaries/
-	#
-	echo -e "`date`\n""done" >> $(LOG)
+	@( date; echo 'done'; )  $(LOG)
 

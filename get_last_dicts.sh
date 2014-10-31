@@ -10,6 +10,7 @@ FILE2=
 BKRS_DSL="bkrs.dsl"
 BRUKS_DSL="bruks.dsl"
 VERSION_TXT="version.txt"
+ECHO="builtin echo "
 
 clean()
 {
@@ -22,16 +23,29 @@ clean()
 
 error()
 {
-  echo -e $*
+  ${ECHO} $*
   clean
   exit 1
+}
+
+check_if_exists()
+{
+	if [ `( find bkrs -name $BKRS_DSL -ctime 0;
+		find bruks -name $BRUKS_DSL -ctime 0; ) |
+		wc -l` == 2 ]
+	then
+		echo "словарные базы загружены менее суток назад.
+чтобы всё-равно скачать новые базы, удалите существующие командой
+$ rm bkrs/$BKRS_DSL bruks/$BRUKS_DSL"
+		exit 0
+	fi
 }
 
 init()
 {
   for FOLDER in "$DEST_FOLDER" "bkrs" "bruks"
   do
-    echo "создаю папку \"$FOLDER\""
+    ${ECHO} "создаю папку \"$FOLDER\""
     mkdir -p $FOLDER
   done ||
 
@@ -42,7 +56,7 @@ init()
 
 search()
 {
-  echo "ищу последние базы"
+  ${ECHO} "ищу последние базы"
 
 curl http://bkrs.info/p47 | #скачать страницу загрузок
 grep '\.gz' |        #найти ежедневные базы в формате .gz
@@ -81,12 +95,12 @@ download()
 
   for url in "$@";
   do
-    msg=$msg"\n$url"
+    msg="${msg}\n${url}"
     file="${url##*/}"
     cmd=$cmd" -o \"$file\" \"$url\" "
   done
 
-  echo -e $msg
+  ${ECHO} $msg
 
   eval $cmd || #скачать
 
@@ -95,7 +109,7 @@ download()
 
 unarcive()
 {
-  echo "разархивация..."
+  ${ECHO} "разархивация..."
 
   gunzip -f *.gz ||
   error "не удаётся разархивировать базы"
@@ -103,12 +117,12 @@ unarcive()
   FILE1=${FILE_GZ1%*.gz}
   FILE2=${FILE_GZ2%*.gz}
 
-  echo "готово"
+  ${ECHO} "готово"
 }
 
 rmbom()
 {
-  echo "убираю BOM..."
+  ${ECHO} "убираю BOM..."
 
   FILES="$@"
   for file in $FILES;
@@ -123,12 +137,12 @@ rmbom()
     error "ошибка"
   done
 
-  echo "готово"
+  ${ECHO} "готово"
 }
 
 rename()
 {
-  echo "переименовываю файлы"
+  ${ECHO} "переименовываю файлы"
 
   bkrs_f=` ls | grep -e "bkrs"      | grep -v -e "\.gz" | head -n 1` &&
   bruks_f=`ls | grep -e "br[u]\?ks" | grep -v -e "\.gz" | head -n 1` ||
@@ -143,30 +157,31 @@ rename()
 
 move()
 {
-  echo "перемещаю в папки /bkrs/ и /bruks/ ..."
+  ${ECHO} "перемещаю в папки /bkrs/ и /bruks/ ..."
 
   mv -f "$BKRS_DSL"  ../bkrs/"$BKRS_DSL"   &&
   mv -f "$BRUKS_DSL" ../bruks/"$BRUKS_DSL" ||
 
   error "не удаётся переместить .dsl файлы"
 
-  echo "готово"
+  ${ECHO} "готово"
 }
 
 clean_maybe()
 {
-  echo "================================================================================"
+  ${ECHO} "================================================================================"
   read -p "очистить исходные и временные файлы? [yes/no] (yes после 30 секунд) " -t 30 ||
     REPLY="yes"
-  echo
+  ${ECHO}
 
-  if [ "`echo "${REPLY: 0:1}" | tr Y y`" == "y" ]
+  if [ "`${ECHO} "${REPLY: 0:1}" | tr Y y`" == "y" ]
   then
     clean
-    echo "готово"
+    ${ECHO} "готово"
   fi
 }
 
+check_if_exists
 init
 search
 download "$URL1" "$URL2"
@@ -175,7 +190,9 @@ rmbom "$FILE1" "$FILE2"
 rename
 move
 
-echo -e "\n""файлы $BRKS_DSL и $BRUKS_DSL успешно скачаны, разархивированы,\n""сконвертированы в utf-8 и сохранены в папках bkrs и bruks"
+${ECHO} "
+файлы $BRKS_DSL и $BRUKS_DSL успешно скачаны, разархивированы,
+сконвертированы в utf-8 и сохранены в папках bkrs и bruks"
 
 clean_maybe
 
