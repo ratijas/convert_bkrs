@@ -13,16 +13,12 @@ convert-bkrs
 
 `$ make install`
 
-## установка для всех пользователей системы
-
-`$ make install-all`
-
 ## файлы и папки
 
+* **./final**
+	- здесь будут лежать готовые пакеты
 * ./downloads
 	- сюда скачиваются базы в dsl формате
-* ./final
-	- здесь будут лежать готовые пакеты
 * ./img
 	- скриншоты приложения Dictionary.app для ознакомления
 
@@ -33,3 +29,6 @@ convert-bkrs
 * java
 * curl
 * gunzip
+
+## скачать готовые словарные пакеты (.torrent)
+![http://rutracker.org/forum/viewtopic.php?t=4743501](http://rutracker.org/forum/viewtopic.php?t=4743501)
