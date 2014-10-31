@@ -31,4 +31,4 @@ convert-bkrs
 * gunzip
 
 ## скачать готовые словарные пакеты (.torrent)
-![http://rutracker.org/forum/viewtopic.php?t=4743501](http://rutracker.org/forum/viewtopic.php?t=4743501)
+[http://rutracker.org/forum/viewtopic.php?t=4743501](http://rutracker.org/forum/viewtopic.php?t=4743501)
