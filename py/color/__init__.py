@@ -1,21 +1,64 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-'''заварачивание пиньиня в строке в span-теги.
+'''searching for pinyin and wrap it with HTML.
 
-пиньинь обрамляется тегами span с классом t0 .. t4,
-в зависимости от тона.
+module provides some useful functions for working with Chinese pinyin,
+"phonetic system for transcribing the Mandarin pronunciations of
+Chinese characters into the Latin alphabet" (c) wikipedia.
+
+detect and wrap pinyin with HTML in plain text string:
+``colorize``
+
+searching for pinyin in string of text:
+``ranges_of_pinyin_in_string``
+
+finding out what tone has some pinyin word:
+``determine_tone``
+
+remove tones (diacritics) from pinyin string (*utility function*):
+``lowercase_string_by_removing_pinyin_tones``
+
+constants:
+PINYIN_LIST -- specially sorted list of all possible pinyin words.
 '''
 
 import re
 from u import u, utf
 
-__all__ = ['colorize',
-		   'remove_diacritics',
-           'determine_tone',
-           'search_for_pin_yin_in_string',
-           ]
+__all__ = [
+    #'colorize',
+    #'ranges_of_pinyin_in_string',
+    'determine_tone',
+    'lowercase_string_by_removing_pinyin_tones',
+    'PINYIN_LIST',
+    ]
 
-PIN_YIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hng,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cei,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,ê,zu,zi,ze,za,yu,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,hm,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split( ',' )
+PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hng,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cei,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,ê,zu,zi,ze,za,yu,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,hm,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split( ',' )
+# sorted by length, so first look up the longest variant.
+
+# static var of function ``lowercase_string_by_removing_pinyin_tones``
+_diacritics = (
+    (u'āáǎăà',    u'a'),
+    (u'ēéěè',     u'e'),
+    (u'ōóǒò',     u'o'),
+    (u'ūúǔùǖǘǚǜ', u'u'),
+    (u'īíǐì',     u'i')
+)
+
+def lowercase_string_by_removing_pinyin_tones(s):
+    '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
+
+    simplify / plainize chinese pinyin by converting it to lower case and
+    removing diacritics from letters 'a', 'e', 'o', 'u', i'.
+    '''
+    s = u(s).lower()
+    for diacrs, normal in _diacritics:
+        for diacr in diacrs:
+            s = s.replace(diacr, normal)
+    return s
+
+
+
 
 def colorize(s):
     '''colorize(s) --> unicode
@@ -30,61 +73,38 @@ def colorize(s):
         состоит из латинской буквы 't' и цифры от нуля до четырёх.
     '''
     found =     search_for_pin_yin_in_string(s)
-    # если ни одного нету, пропустить
+    # if none found, just skip
     if len(found) == 0:
         return s
     return colorize_pin_yin(s, found)
 
 
-def _closure():
-    # ---- статические переменные
-    diacritics = (
-        (u'āáǎăà',    u'a'),
-        (u'ēéěè',     u'e'),
-        (u'ōóǒò',     u'o'),
-        (u'ūúǔùǖǘǚǜ', u'u'),
-        (u'īíǐì',     u'i'),
-    )
-
-    def remove_diacritics(s):
-        '''убирает тона (диакритики) с И приводит к нижнему регистру
-        гласные a, e, o, i, u'''
-        s = u(s).lower()
-        for diacrs, normal in diacritics:
-            for diacr in diacrs:
-                s = s.replace(diacr, normal)
-        return s
-
-    return remove_diacritics
-remove_diacritics = _closure()
 
 
 def _closure():
-    # ---- статические переменные
+    # ---- static vars
     re1 = re.compile( u"[āēūǖīō]",  re.UNICODE )
     re2 = re.compile( u"[áéúǘíó]",  re.UNICODE )
     re3 = re.compile( u"[ǎăěǔǚǐǒ]", re.UNICODE )
     re4 = re.compile( u"[àèùǜìò]",  re.UNICODE )
 
-    def determine_tone(pin_yin_word):
-        '''determine_tone(pin_yin) -> {0..4}
+    def determine_tone(pinyin):
+        '''determine_tone(string) --> {0..4}
 
-        определить тон переданого слога.
-        возвращаемое значение:
-            int от одного до четырех, или ноль.
+        detect tone of given pinyin word.
+        return value:
+            int from 0 up to 4, where 0 means that tone undetermined.
         '''
-        pin_yin_word = u(pin_yin_word)
-        # быстрее и компактнее так, чем делать цикл и массив
-        # тон слога определяется наличием одного из этих символов
-        if re1.search(pin_yin_word):
+        pinyin = u(pinyin)
+        if re1.search(pinyin):
             return 1
-        if re2.search(pin_yin_word):
+        if re2.search(pinyin):
             return 2
-        if re3.search(pin_yin_word):
+        if re3.search(pinyin):
             return 3
-        if re4.search(pin_yin_word):
+        if re4.search(pinyin):
             return 4
-        # не нашли, значит нулевой тон
+        # not found, fall-back to  zero
         return 0
 
     return determine_tone

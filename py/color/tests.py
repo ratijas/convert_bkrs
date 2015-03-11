@@ -8,9 +8,11 @@ import unittest
 sys.path.append('../')
 import color
 
+_baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
+
 class SearchPinYinTestCase(unittest.TestCase):
     def setUp(self):
-        self.s = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
+        self.s = _baiwen
     def tearDown(self):
         pass
     def testBaiwenBuruYijian(self):
@@ -21,7 +23,7 @@ class ColorizeTestCase(unittest.TestCase):
         baiwen = u'bǎiwén'
         expected = u'<span class="t3">bǎi</span><span class="t2">wén</span>'
         self.failUnlessEqual(color.colorize(baiwen), expected)
-    
+
 
 
 class determineToneTestCase(unittest.TestCase):
@@ -42,24 +44,21 @@ class determineToneTestCase(unittest.TestCase):
         self.failUnlessEqual(0, color.determine_tone('ning'))
     def testNonPinYin(self):
         self.failUnlessEqual(0, color.determine_tone('бурда'))
-    
-    
 
-
-def main():
-	s = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
-	print u'изначально: "%s"' % s
-	r = search_for_pin_yin_in_string( s )
-	print u'search_for_pin_yin_in_string() ->'
-	for e in r:
-		print u'\t' u'start: %d,' u'\t' u'value: %s' % \
-			( e[ 'start' ], u( e[ 'value' ]))
-
-	print u'colorize\n----'
-
-	s2 = colorize( s )
-	print u'type is', type( s2 )
-	print s2
+class lowercase_remove_tones_TestCase(unittest.TestCase):
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    def test_lowercase_string_by_rempoving_pinyin_tones(self):
+        cmd = color.lowercase_string_by_removing_pinyin_tones
+        s_list = [
+            (u"À! Zhēn měi!", u"a! Zhen mei!"),
+            (_baiwen, u'baiwen buru yijian // fang’an // fangan // xuniang'),
+            ("Nǐ lái háishi bù lái?", u"ni lai haishi bu lai?"),  # not unicode
+            ]
+        for with_tones, clean in s_list:
+            self.failUnlessEqual(cmd(with_tones), clean)
 
 if __name__ == '__main__':
     unittest.main()
