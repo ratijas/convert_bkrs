@@ -50,10 +50,6 @@ class determineToneTestCase(unittest.TestCase):
         self.failUnlessEqual(0, color.determine_tone('бурда'))
 
 class lowercase_remove_tones_TestCase(unittest.TestCase):
-    def setUp(self):
-        pass
-    def tearDown(self):
-        pass
     def test_lowercase_string_by_rempoving_pinyin_tones(self):
         cmd = color.lowercase_string_by_removing_pinyin_tones
         s_list = [
