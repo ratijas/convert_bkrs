@@ -111,6 +111,9 @@ def _closure():
 determine_tone = _closure()
 
 
+def ranges_of_pinyin_in_string(s):
+    pass
+
 def search_for_pin_yin_in_string(s):
     '''search_for_pin_yin_in_string(s) -> list
 
@@ -123,7 +126,7 @@ def search_for_pin_yin_in_string(s):
 
     s = u(s)
 
-    py_plain = remove_diacritics( s )
+    py_plain = lowercase_string_by_removing_pinyin_tones( s )
 
     #  пройтись по всей строке 
     char_p = 0
@@ -146,10 +149,10 @@ def search_for_pin_yin_in_string(s):
         #  переменная ``found'' -- нашли или нет?
         found = False
 
-        # циклический поиск строк из списка ``PIN_YIN_LIST''
+        # циклический поиск строк из списка ``PINYIN_LIST''
         # в упрощёной входной строке c текущего индекса
 
-        for word in PIN_YIN_LIST:
+        for word in PINYIN_LIST:
 
             #  так быстрее, чем indexOf() потому, что не ищет по всей строке 
             #  от текущего индекса до (текущего индекса + длинна того чтения, который сверяем)
@@ -170,7 +173,7 @@ def search_for_pin_yin_in_string(s):
                         word = word[ : -1 ]
 
                         # проверка
-                        if word not in PIN_YIN_LIST:
+                        if word not in PINYIN_LIST:
                             # такого не существует ???
                             char_p = skip( char_p, py_plain )
                         # всё ок. откат удался

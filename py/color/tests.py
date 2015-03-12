@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''testing for color.py'''
+'''testing for color.py.'''
 
 import sys
 import unittest
@@ -12,14 +12,18 @@ _baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
 
 class SearchPinYinTestCase(unittest.TestCase):
     def setUp(self):
-        self.s = _baiwen
+        self._cmd = color.ranges_of_pinyin_in_string
     def tearDown(self):
         pass
     def testBaiwenBuruYijian(self):
-        r = color.search_for_pin_yin_in_string(self.s)
+        rs = self._cmd(_baiwen)
+    def testRanges(self):
+        ranges = self._cmd(u"Gōngzuò")
+        expected = [(0, 4), (4, 3)]
+        #self.failUnlessEqual(ranges, expected)
         
 class ColorizeTestCase(unittest.TestCase):
-    def testBasics(self):
+    def testColorizeBaiwen(self):
         baiwen = u'bǎiwén'
         expected = u'<span class="t3">bǎi</span><span class="t2">wén</span>'
         self.failUnlessEqual(color.colorize(baiwen), expected)
@@ -53,7 +57,7 @@ class lowercase_remove_tones_TestCase(unittest.TestCase):
     def test_lowercase_string_by_rempoving_pinyin_tones(self):
         cmd = color.lowercase_string_by_removing_pinyin_tones
         s_list = [
-            (u"À! Zhēn měi!", u"a! Zhen mei!"),
+            (u"À! Zhēn měi!", u"a! zhen mei!"),
             (_baiwen, u'baiwen buru yijian // fang’an // fangan // xuniang'),
             ("Nǐ lái háishi bù lái?", u"ni lai haishi bu lai?"),  # not unicode
             ]
