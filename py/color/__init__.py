@@ -59,6 +59,16 @@ def lowercase_string_by_removing_pinyin_tones(s):
     return s
 
 
+def colorized_html_string_from_string(s):
+    '''docstring'''
+    s = u(s)
+    ranges = ranges_of_pinyin_in_string(s)
+    if not ranges:
+        return s
+    # do a colorize work here
+    return s
+
+
 def colorize(s):
     '''colorize(s) --> unicode
     
