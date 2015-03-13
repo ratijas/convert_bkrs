@@ -81,34 +81,31 @@ def colorize(s):
 
 
 
-def _closure():
-    # ---- static vars
-    re1 = re.compile( u"[āēūǖīō]",  re.UNICODE )
-    re2 = re.compile( u"[áéúǘíó]",  re.UNICODE )
-    re3 = re.compile( u"[ǎăěǔǚǐǒ]", re.UNICODE )
-    re4 = re.compile( u"[àèùǜìò]",  re.UNICODE )
+# ---- static vars
+_t1 = u"āēūǖīō"
+_t2 = u"áéúǘíó"
+_t3 = u"ǎăěǔǚǐǒ"
+_t4 = u"àèùǜìò"
 
-    def determine_tone(pinyin):
-        '''determine_tone(string) --> {0..4}
+def determine_tone(pinyin):
+    '''determine_tone(string) --> {0..4}
 
-        detect tone of given pinyin word.
-        return value:
-            int from 0 up to 4, where 0 means that tone undetermined.
-        '''
-        pinyin = u(pinyin)
-        if re1.search(pinyin):
+    detect tone of given pinyin word.
+    return value:
+        int from 0 up to 4, where 0 means that tone undetermined.
+    '''
+    pinyin = u(pinyin)
+    for letter in pinyin:
+        if letter in _t1:
             return 1
-        if re2.search(pinyin):
+        if letter in _t2:
             return 2
-        if re3.search(pinyin):
+        if letter in _t3:
             return 3
-        if re4.search(pinyin):
+        if letter in _t4:
             return 4
-        # not found, fall-back to  zero
-        return 0
-
-    return determine_tone
-determine_tone = _closure()
+    # not found, fall-back to  zero
+    return 0
 
 
 # ---- static vars
