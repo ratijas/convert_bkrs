@@ -45,6 +45,7 @@ _diacritics = (
     (u'īíǐì',     u'i')
 )
 
+
 def lowercase_string_by_removing_pinyin_tones(s):
     '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
 
@@ -56,8 +57,6 @@ def lowercase_string_by_removing_pinyin_tones(s):
         for diacr in diacrs:
             s = s.replace(diacr, normal)
     return s
-
-
 
 
 def colorize(s):
@@ -72,13 +71,11 @@ def colorize(s):
         в теги <span class="t{0..4}">...</span>.  т.е. класс элемента
         состоит из латинской буквы 't' и цифры от нуля до четырёх.
     '''
-    found =     search_for_pin_yin_in_string(s)
+    ranges = ranges_of_pinyin_in_string(s)
     # if none found, just skip
-    if len(found) == 0:
-        return s
+    if len(ranges) == 0:
+        return u(s)
     return colorize_pin_yin(s, found)
-
-
 
 
 # ---- static vars
@@ -124,10 +121,16 @@ def ranges_of_pinyin_in_string(s):
         where range is 2-tuple of (index, length).
         list can be empty.
     '''
-    raise NotImplementedError
     result = []
-    def range(index, length):
+    def range_(index, length):
         return (index, length)
+    def skip():
+        # skip sequence of non-space
+        # and then sequence of spaces
+        while char_p < plain_s_len and not plain_s[char_p].isspace():
+            char_p += 1
+        while char_p < plain_s_len and plain_s[char_p].isspace():
+            char_p += 1
 
     # the trick of replacing 'v' is that 'v' does not exists in pinyin,
     # but still returns *True* on str.islower()
@@ -148,137 +151,57 @@ def ranges_of_pinyin_in_string(s):
         # sorted by length.
         for word in PINYIN_LIST:
             word_len = len(word)
-            if plain_s.find(word, char_p, char_p + word_len) != -1:
-                # rule of apostrophe: "'" must be before 'a', 'e' and 'o'.
+
+            if plain_s[char_p : char_p + word_len] == word:
+                # rule of apostrophe in pinyin:
+                #   "'" must be before 'a', 'e' and 'o'.
+                #
                 # if next letter exactly 'a', 'e' or 'o',
-                # do a rollback by one letter and check.
+                #   do a rollback by one letter and check, if such word exists.
+                #
                 # remember that a pinyin never begins with 'i' or 'u',
-                # and 'v' already replaced with space before the loop.
-                if plain_s[char_p + word_len] in 'aoeiu':
-                    # rollback
-                    pass
+                #   and 'v' already replaced with space before the loop.
+                if char_p + word_len < plain_s_len - 1 and\
+                    plain_s[char_p + word_len] in 'aoeiu':
+
+                    shorten_word = word[:-1]
+
+                    if shorten_word not in PINYIN_LIST:
+                        # then our rollback failed,
+                        # there should be an error in pinyin,
+                        # but we'll try hard to save the situation.
+                        skip()
+                        word = None
+                        break
+                    else:
+                        word = shorten_word
+                        word_len = len(word)
+                # *word* keeps the word we found.
+                break
         else:
             # loop exited normally, means word not matches pinyin
-            skip()
+            #skip()
+            char_p += 1
+            word = None
+
+        # add word if there's one.
+        if word:
+            result.append(range_(char_p, word_len))
+            char_p += word_len
+        #else:
+            # means that a letter is latin, but pinyin not found.
+            # skipping already done on for's *else* branch.
 
     return result
-
 
 
 def search_for_pin_yin_in_string(s):
     '''search_for_pin_yin_in_string(s) -> list
 
-    возвращаемый список состоит из словарей,
-    каждый из которых содержит два элемента:
-    точку начала (start: uint)
-    и кусок пиньиня (value: str)
+    obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.
     '''
-    result = []
-
-    s = u(s)
-
-    py_plain = lowercase_string_by_removing_pinyin_tones( s )
-
-    #  пройтись по всей строке 
-    char_p = 0
-    while char_p < len( py_plain ):
-        #  получить код символа 
-        ch = ord( py_plain[ char_p ])
-        #  97  -- это код символа 'a' 
-        #  122 -- это код символа 'z' 
-        if not ( 97 <= ch <= 122 ):
-            #  не буква латиницы 
-            #  сдвиг счётчика 
-            char_p += 1
-            #  пропускаем 
-            continue
-
-        #  если мы дошли сюда, значит символ -- буква латиницы 
-
-        #  в случае нахождения ``word'' содержит строку 
-        word = None
-        #  переменная ``found'' -- нашли или нет?
-        found = False
-
-        # циклический поиск строк из списка ``PINYIN_LIST''
-        # в упрощёной входной строке c текущего индекса
-
-        for word in PINYIN_LIST:
-
-            #  так быстрее, чем indexOf() потому, что не ищет по всей строке 
-            #  от текущего индекса до (текущего индекса + длинна того чтения, который сверяем)
-
-            if py_plain[ char_p : char_p + len( word )] == word:
-
-                # правило апострофа:
-                # апостроф ставится перед словом на a/o/e.
-                # если следующая буква -- a/o/e, делаем откат на
-                #   одну букву назад и проверяем результат.
-                # слово не может начинаться с букв i/u
-                #     а буквы ``v'' вообще нет.
-
-                try:
-                    next_letter = py_plain[ char_p + len( word )]
-                    if next_letter in 'aoeiu':
-                    # убрать последний символ; откат на одну букву
-                        word = word[ : -1 ]
-
-                        # проверка
-                        if word not in PINYIN_LIST:
-                            # такого не существует ???
-                            char_p = skip( char_p, py_plain )
-                        # всё ок. откат удался
-                except IndexError:
-                    # в питоне обращение к элементу за пределами диапазона вызывает ошибку
-                    pass
-                # нашли, записываем
-                found = True
-                # прекращаем цикл
-                break
-            # конец if
-        # конец for
-
-        #  нашли 
-        if found:
-            #  пригодится пару раз 
-            py_length = len( word )
-
-            # записать соответствующую часть пиньиня из входной строки
-            # в словарь под ключом, равным текущему индексу
-            result.append({
-                'start': char_p,
-                'value': utf( s[ char_p : char_p + py_length])
-                })
-            #  сдвинуть указатель за пределы текущего слова 
-            char_p += py_length
-        else:
-            #  это латинская буква, но пиньинь не нашли 
-            char_p = skip( char_p, py_plain )
-        # конец if found
-    # конец while char_p < len( pin_yin )
-
-    #  вернуть массив
-    return result
-
-
-def _closure():
-    # ---- статические переменные
-    space_re     = re.compile( r'\W*', re.L )
-    not_space_re = re.compile( r'\w*', re.L )
-
-    def skip( char_p, py_plain ):
-        # резануть
-        py_plain = py_plain[ char_p : ]
-        
-        # пропустить все не-пробелы
-        end = re.match( not_space_re, py_plain ).end()
-        char_p += end
-        # пропустить все пробелы
-        end = re.match( space_re, py_plain[ end : ]).end()
-
-        return char_p + end
-    return skip
-skip = _closure()
+    raise NotImplementedError(
+        "obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.")
 
 
 def colorize_pin_yin( text, pin_yin_pairs ):
