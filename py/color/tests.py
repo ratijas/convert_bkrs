@@ -10,24 +10,21 @@ import color
 
 _baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
 
-class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
+
+class ignore_link_and_input_node_filter_TestCase(unittest.TestCase):
     def setUp(self):
-        self._cmd = color.ranges_of_pinyin_in_string
-    def testOneWord(self):
-        self.failUnlessEqual(self._cmd(u"bǎi"), [(0, 3)])
-        self.failUnlessEqual(self._cmd(u" jiàn."), [(1, 4)])
-        self.failUnlessEqual(self._cmd(u"...-niang, ..."), [(4, 5)])
-    def testRanges(self):
-        ranges = self._cmd(u"Gōngzuò")
-        self.failUnlessEqual(ranges, [(0, 4), (4, 3)])
-    def testBaiwenBuruYijian(self):
-        ranges = self._cmd(_baiwen)
-        self.failUnlessEqual(ranges, [(0,3), (3,3), (7,2), (9,2), (12,2),
-            (14,4), (22,4), (27,2), (33,3), (36,3), (43,2), (45,5)])
+        from lxml import etree
+        self.et = etree
 
 
-class colorized_TestCase(unittest.TestCase):
-    def testColorizedHTMLString(self):
+class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
+    def setUp(self):
+        from lxml import etree
+        self.et = etree
+
+
+class colorized_HTML_string_TestCase(unittest.TestCase):
+    def test_pairs(self):
         cmd = color.colorized_HTML_string_from_string
         test_pairs = [
             (u'bǎiwén',
@@ -35,8 +32,28 @@ class colorized_TestCase(unittest.TestCase):
             ]
         for source, expected in test_pairs:
             self.failUnlessEqual(cmd(source), expected)
-    def testColorizedDOM(self):
-        pass
+
+
+class colorized_HTML_element_TestCase(unittest.TestCase):
+    def setUp(self):
+        from lxml import etree
+        self.et = etree
+
+
+class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
+    def setUp(self):
+        self._cmd = color.ranges_of_pinyin_in_string
+    def test_one_word(self):
+        self.failUnlessEqual(self._cmd(u"bǎi"), [(0, 3)])
+        self.failUnlessEqual(self._cmd(u" jiàn."), [(1, 4)])
+        self.failUnlessEqual(self._cmd(u"...-niang, ..."), [(4, 5)])
+    def test_two_words(self):
+        ranges = self._cmd(u"Gōngzuò")
+        self.failUnlessEqual(ranges, [(0, 4), (4, 3)])
+    def test_baiwen_buru_yijian(self):
+        ranges = self._cmd(_baiwen)
+        self.failUnlessEqual(ranges, [(0,3), (3,3), (7,2), (9,2), (12,2),
+            (14,4), (22,4), (27,2), (33,3), (36,3), (43,2), (45,5)])
 
 
 class determine_tone_TestCase(unittest.TestCase):
@@ -60,7 +77,7 @@ class determine_tone_TestCase(unittest.TestCase):
     def testMixedPinyin(self):
         self.failUnlessEqual(3, color.determine_tone('bǎiwén'))
 
-class lowercase_remove_tones_TestCase(unittest.TestCase):
+class utilities_TestCase(unittest.TestCase):
     def test_lowercase_string_by_rempoving_pinyin_tones(self):
         cmd = color.lowercase_string_by_removing_pinyin_tones
         s_list = [

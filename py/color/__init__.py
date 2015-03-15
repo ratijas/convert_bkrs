@@ -10,6 +10,9 @@ modify given DOM by replacing children text nodes containing pinyin with
 wrapper element:
 ``colorize_DOM``
 
+undo colorize:
+``uncolorize_DOM``
+
 detect and wrap pinyin with HTML in plain text string:
 ``colorized_HTML_string_from_string``
 
@@ -26,51 +29,96 @@ remove tones (diacritics) from pinyin string (*utility function*):
 ``lowercase_string_by_removing_pinyin_tones``
 
 constants:
+
 PINYIN_LIST -- specially sorted list of all possible pinyin words.
+
+PINYIN_WRAPPER_CLASS -- default class used by ``[un]colorize_DOM``.
 '''
 
 import re
 from u import u, utf
 
 __all__ = [
+    'ignore_link_and_input_node_filter',
     'colorize_DOM',
+    'uncolorize_DOM',
     'colorized_HTML_string_from_string',
     'colorized_HTML_element_from_string',
     'ranges_of_pinyin_in_string',
     'determine_tone',
     'lowercase_string_by_removing_pinyin_tones',
     'PINYIN_LIST',
+    'PINYIN_WRAPPER_CLASS',
     ]
 
 PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(',')
 # sorted by length, so first look up the longest variant.
 
+PINYIN_WRAPPER_CLASS = u'pinYinWrapper'
+
 
 def colorize(s):
     '''colorize(s) --> unicode
 
-    obsoleted by colorize_DOM``
+    !! obsoleted by ``colorize_DOM``.  use that one instead.
     '''
-    '''colorize(s) --> unicode
-    
-    центральный элемент модуля. парсинг, оформление пиньиня.
-    входные параметры:
-    - s
-        str или unicode, потенциально содержащая пиньинь
-    возвращаемое значение:
-        unicode; входная строка, найденные вхождения пиньиня завёрнуты
-        в теги <span class="t{0..4}">...</span>.  т.е. класс элемента
-        состоит из латинской буквы 't' и цифры от нуля до четырёх.
+    raise NotImplementedError(
+        "obsoleted by ``colorize_DOM``.  use that one instead.")
+
+
+def ignore_link_and_input_node_filter(node):
+    return True
+
+
+def colorize_DOM(root_node,
+                 node_filter=ignore_link_and_input_node_filter,
+                 pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
+                 tones_classes=(u"t0", u"t1", u"t2", u"t3", u"t4")):
+    '''colorize_DOM(root_node, node_filter, pinyin_wrapper_class, tones_classes) --> None
+
+    modify given DOM in place.  using ``lxml.etree``.
+    detect and colorize pinyin in text nodes of *root_node* and its
+    child nodes ignoring nodes for which *node_filter* returns False.
+    text nodes will be replaced with <span> wrapper whose class
+    attribute is *pinyin_wrapper_class*.
+    wrapper will contain only text nodes and <span>s with one of
+    *tones_classes* accordingly to the tone of containing pinyin.
+
+    parameters:
+        root_node -- instance of ``lxml.etree``.
+        node_filter -- callable.
+            parameters:
+                node -- instance of ``lxml.etree``.
+            return value:
+                True to allow function to look up for pinyin inside
+                node itself or its child nodes, otherwise False.
+                its useful to deny colorizing of <a> or other elements
+                that should have their own colors by design.
+        pinyin_wrapper_class -- class for wrapper <span>
+        tones_classes -- 5-tuple of class names for <span> inside
+            wrapper.  element with index [0] will be used for zero
+            tone, [1] for first and so on.
+
+    return value:
+        None
     '''
-    ranges = ranges_of_pinyin_in_string(s)
-    # if none found, just skip
-    if len(ranges) == 0:
-        return u(s)
-    return colorize_pin_yin(s, found)
+    pass
+
+
+def uncolorize_DOM(root_node, pinyin_wrapper_class=PINYIN_WRAPPER_CLASS):
+    '''uncolorize_DOM(root_node, pinyin_wrapper_class) --> None
+
+    opposite to ``colorize_DOM``.  replace back wrappers (nodes with
+    class equal to *pinyin_wrapper_class*) with contained text.
+    '''
+    pass
 
 
 def colorized_HTML_string_from_string(s):
-    '''docstring'''
+    '''colorized_HTML_string_from_string(s)
+
+    detect and wrap pinyin with HTML in plain text string:
+    '''
     s = u(s)
     ranges = ranges_of_pinyin_in_string(s)
     if not ranges:
@@ -132,9 +180,9 @@ def determine_tone(pinyin):
 # ---- static vars
 
 def ranges_of_pinyin_in_string(s):
-    '''ranges_of_pinyin_in_string(string) -> list<range>
+    '''ranges_of_pinyin_in_string(string) --> list<range>
 
-    !! replacing obsolete ``search_for_pin_yin_in_string``
+    !! replacing obsolete ``search_for_pin_yin_in_string``.
 
     searches for pinyin in given string *s*.  *s* must be either
     unicode string or utf-8 encoded ``str``, or anything else that
@@ -220,16 +268,16 @@ def ranges_of_pinyin_in_string(s):
 
 
 def search_for_pin_yin_in_string(s):
-    '''search_for_pin_yin_in_string(s) -> list
+    '''search_for_pin_yin_in_string(s) --> list
 
-    obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.
+    !! obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.
     '''
     raise NotImplementedError(
         "obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.")
 
 
 def colorize_pin_yin( text, pin_yin_pairs ):
-    '''colorize_pin_yin( text, pin_yin_pairs ) -> str
+    '''colorize_pin_yin( text, pin_yin_pairs ) --> str
 
     text -- текст с пиньинем
     pin_yin_pairs -- список в виде {start: int, value: str }
