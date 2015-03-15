@@ -27,10 +27,16 @@ class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
 
 
 class colorized_TestCase(unittest.TestCase):
-    def testColorizeBaiwen(self):
-        baiwen = u'bǎiwén'
-        expected = u'<span class="t3">bǎi</span><span class="t2">wén</span>'
-        #self.failUnlessEqual(color.colorize(baiwen), expected)
+    def testColorizedHTMLString(self):
+        cmd = color.colorized_HTML_string_from_string
+        test_pairs = [
+            (u'bǎiwén',
+                u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span></span>'),
+            ]
+        for source, expected in test_pairs:
+            self.failUnlessEqual(cmd(source), expected)
+    def testColorizedDOM(self):
+        pass
 
 
 class determine_tone_TestCase(unittest.TestCase):

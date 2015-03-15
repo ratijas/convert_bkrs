@@ -6,8 +6,15 @@ module provides some useful functions for working with Chinese pinyin,
 "phonetic system for transcribing the Mandarin pronunciations of
 Chinese characters into the Latin alphabet" (c) wikipedia.
 
+modify given DOM by replacing children text nodes containing pinyin with
+wrapper element:
+``colorize_DOM``
+
 detect and wrap pinyin with HTML in plain text string:
-``colorize``
+``colorized_HTML_string_from_string``
+
+do the same, but returns a wrapper -- DOM element:
+``colorized_HTML_element_from_string``
 
 searching for pinyin in string of text:
 ``ranges_of_pinyin_in_string``
@@ -26,7 +33,9 @@ import re
 from u import u, utf
 
 __all__ = [
-    #'colorize',
+    'colorize_DOM',
+    'colorized_HTML_string_from_string',
+    'colorized_HTML_element_from_string',
     'ranges_of_pinyin_in_string',
     'determine_tone',
     'lowercase_string_by_removing_pinyin_tones',
@@ -36,40 +45,12 @@ __all__ = [
 PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(',')
 # sorted by length, so first look up the longest variant.
 
-# static var of function ``lowercase_string_by_removing_pinyin_tones``
-_diacritics = (
-    (u'āáǎăà',    u'a'),
-    (u'ēéěè',     u'e'),
-    (u'ōóǒò',     u'o'),
-    (u'ūúǔùǖǘǚǜ', u'u'),
-    (u'īíǐì',     u'i')
-)
-
-
-def lowercase_string_by_removing_pinyin_tones(s):
-    '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
-
-    simplify / plainize chinese pinyin by converting it to lower case and
-    removing diacritics from letters 'a', 'e', 'o', 'u', i'.
-    '''
-    s = u(s).lower()
-    for diacrs, normal in _diacritics:
-        for diacr in diacrs:
-            s = s.replace(diacr, normal)
-    return s
-
-
-def colorized_html_string_from_string(s):
-    '''docstring'''
-    s = u(s)
-    ranges = ranges_of_pinyin_in_string(s)
-    if not ranges:
-        return s
-    # do a colorize work here
-    return s
-
 
 def colorize(s):
+    '''colorize(s) --> unicode
+
+    obsoleted by colorize_DOM``
+    '''
     '''colorize(s) --> unicode
     
     центральный элемент модуля. парсинг, оформление пиньиня.
@@ -86,6 +67,39 @@ def colorize(s):
     if len(ranges) == 0:
         return u(s)
     return colorize_pin_yin(s, found)
+
+
+def colorized_HTML_string_from_string(s):
+    '''docstring'''
+    s = u(s)
+    ranges = ranges_of_pinyin_in_string(s)
+    if not ranges:
+        return s
+    # do a colorize work here
+    return s
+
+
+# ---- static vars
+_diacritics = (
+    (u'āáǎăà',    u'a'),
+    (u'ēéěè',     u'e'),
+    (u'ōóǒò',     u'o'),
+    (u'ūúǔùǖǘǚǜ', u'u'),
+    (u'īíǐì',     u'i')
+)
+
+def lowercase_string_by_removing_pinyin_tones(s):
+    '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
+
+    simplify / plainize chinese pinyin by converting it to lower case and
+    removing diacritics from letters 'a', 'e', 'o', 'u', i'.
+    '''
+    s = u(s).lower()
+    for diacrs, normal in _diacritics:
+        for diacr in diacrs:
+            s = s.replace(diacr, normal)
+    return s
+
 
 
 # ---- static vars
