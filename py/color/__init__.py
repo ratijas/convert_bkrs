@@ -123,6 +123,8 @@ def colorized_HTML_string_from_string(
         tones_classes=TONES_CLASSES):
     '''colorized_HTML_string_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> unicode
 
+    !! replacing obsolete ``colorize_pin_yin``.
+
     detect and wrap pinyin with HTML in plain text *string*.  if no
     pinyin found, string won't be modified and no wrapper applied.
 
@@ -306,58 +308,12 @@ def search_for_pin_yin_in_string(s):
         "obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.")
 
 
-def colorize_pin_yin( text, pin_yin_pairs ):
-    '''colorize_pin_yin( text, pin_yin_pairs ) --> str
+def colorize_pin_yin(text, pin_yin_pairs):
+    '''colorize_pin_yin(text, pin_yin_pairs) --> str
 
-    text -- текст с пиньинем
-    pin_yin_pairs -- список в виде {start: int, value: str }
+    !! obsoleted by ``colorized_HTML_string_from_string`` and
+    ``colorized_HTML_element_from_string``.  use one of those instead.
     '''
-
-    # сразу определить тона. если все тона нулевые, не раскрашивать
-    all_tones_are_zero = True
-
-    for el in pin_yin_pairs:
-        start, value = el['start'], u( el[ 'value' ])
-        # определить
-        t = determine_tone( value );
-        # сохранить на потом
-        el['tone'] = t
-        # проверить
-        if t is not 0:
-            all_tones_are_zero = False
-
-    # наверное, это не пиньинь, а английское слово
-    if all_tones_are_zero: return
-
-    # котейнер для всего содержимого этой ветки
-    # <span class='pinYinWrapper'>
-    wrapper = ''
-
-    # предыдущая пара, нужна для вставки содержимого между пиньинем
-    prev_pair_end = None
-
-    for el in pin_yin_pairs:
-        # явно преобразовать. а то мало ли что
-        start, value, tone = int( el['start'] ), u( el[ 'value' ]), el['tone']
-
-        # записать предшествующий не-пиньинь в родительский span
-            # резать от предыдущего конца
-            # ну, или от начала строки
-            # до текущего начала, не включительно
-        wrapper += text[
-            prev_pair_end and prev_pair_end or 0
-            :
-            start
-        ]
-
-        # цветастый span для отдельного слога
-        span = u'<span class="t%d">%s</span>' % ( tone, value )
-
-        # припаять к контейнеру
-        wrapper += span
-        # записать текущую пару
-        prev_pair_end = start + len( value )
-
-    # от последнего пиньиня и до конца
-    wrapper += text[ prev_pair_end : ]
-    return wrapper
+    raise NotImplementedError(
+        "obsoleted by ``colorized_HTML_string_from_string`` and "
+        "``colorized_HTML_element_from_string``.  use one of those instead.")
