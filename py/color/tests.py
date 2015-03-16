@@ -26,13 +26,30 @@ class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
 class colorized_HTML_string_TestCase(unittest.TestCase):
     def test_pairs(self):
         cmd = color.colorized_HTML_string_from_string
-        test_pairs = [
-            (u'bǎiwén',
-                u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span></span>'),
-            ]
-        for source, expected in test_pairs:
-            self.failUnlessEqual(cmd(source), expected)
-
+        self.failUnlessEqual(cmd(u'1 bǎiwén'),
+            u'<span class="pinYinWrapper">1 <span class="t3">bǎi</span><span class="t2">wén</span></span>')
+        self.failUnlessEqual(cmd(_baiwen),
+            u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span> <span class="t4">bù</span><span class="t2">rú</span> <span class="t1">yī</span><span class="t4">jiàn</span> // <span class="t1">fāng</span>’<span class="t4">àn</span> // <span class="t3">fǎn</span><span class="t2">gán</span> // <span class="t2">xú</span><span class="t0">niang</span></span>')
+        self.failUnlessEqual(cmd(u'3 nóngmíngōng'),
+            u'<span class="pinYinWrapper">3 <span class="t2">nóng</span><span class="t2">mín</span><span class="t1">gōng</span></span>')
+        self.failUnlessEqual(cmd(u'4 kǒu’ànshàng'),
+            u'<span class="pinYinWrapper">4 <span class="t3">kǒu</span>’<span class="t4">àn</span><span class="t4">shàng</span></span>')
+        self.failUnlessEqual(cmd(u'5 kǒuànshàng'),
+            u'<span class="pinYinWrapper">5 <span class="t3">kǒu</span><span class="t4">àn</span><span class="t4">shàng</span></span>')
+        self.failUnlessEqual(cmd(u'6 fēngōngsī'),
+            u'<span class="pinYinWrapper">6 <span class="t1">fēn</span><span class="t1">gōng</span><span class="t1">sī</span></span>')
+        self.failUnlessEqual(cmd(u'7 āiyō'),
+            u'<span class="pinYinWrapper">7 <span class="t1">āi</span><span class="t1">yō</span></span>')
+        self.failUnlessEqual(cmd(u'8 shénme'),
+            u'<span class="pinYinWrapper">8 <span class="t2">shén</span><span class="t0">me</span></span>')
+        self.failUnlessEqual(cmd(u'9 fādiǎ'),
+            u'<span class="pinYinWrapper">9 <span class="t1">fā</span><span class="t3">diǎ</span></span>')
+        self.failUnlessEqual(cmd(u'10 zhǐdìng'),
+            u'<span class="pinYinWrapper">10 <span class="t3">zhǐ</span><span class="t4">dìng</span></span>')
+        self.failUnlessEqual(cmd(u'11. yī; yì'),
+            u'<span class="pinYinWrapper">11. <span class="t1">yī</span>; <span class="t4">yì</span></span>')
+        self.failUnlessEqual(cmd(u'nánguò // lángxīngǒufèi // èr’ěryīde'),
+            u'<span class="pinYinWrapper"><span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
 
 class colorized_HTML_element_TestCase(unittest.TestCase):
     def setUp(self):

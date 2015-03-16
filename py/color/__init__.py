@@ -52,7 +52,7 @@ __all__ = [
     'TONES_CLASSES',
     ]
 
-PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(',')
+PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,dia,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yo,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,me,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(',')
 # sorted by length, so first look up the longest variant.
 
 PINYIN_WRAPPER_CLASS = u'pinYinWrapper'
@@ -217,7 +217,7 @@ def _slice(self, obj):
 _range._slice = _slice
 
 def ranges_of_pinyin_in_string(s):
-    '''ranges_of_pinyin_in_string(string) --> list<range>
+    '''ranges_of_pinyin_in_string(string) --> list<_range>
 
     !! replacing obsolete ``search_for_pin_yin_in_string``.
 
@@ -227,17 +227,10 @@ def ranges_of_pinyin_in_string(s):
 
     return value:
         list of ranges of pinyin,
-        where range is 2-namedtuple of (location, length).
+        where ``_range`` is 2-namedtuple of (location, length).
         list can be empty.
     '''
     result = []
-    def skip():
-        # skip sequence of non-space
-        # and then sequence of spaces
-        while char_p < plain_s_len and not plain_s[char_p].isspace():
-            char_p += 1
-        while char_p < plain_s_len and plain_s[char_p].isspace():
-            char_p += 1
 
     # the trick of replacing 'v' is that 'v' does not exists in pinyin,
     # but still returns *True* on str.islower()
@@ -268,34 +261,36 @@ def ranges_of_pinyin_in_string(s):
                 #
                 # remember that a pinyin never begins with 'i' or 'u',
                 #   and 'v' already replaced with space before the loop.
-                if char_p + word_len < plain_s_len - 1 and\
+                if char_p + word_len + 1 < plain_s_len and\
                     plain_s[char_p + word_len] in 'aoeiu':
 
                     shorten_word = word[:-1]
 
-                    if shorten_word not in PINYIN_LIST:
+                    if shorten_word in PINYIN_LIST:
+                        word = shorten_word
+                        word_len = len(word)
+                    #else:
                         # then our rollback failed,
                         # there should be an error in pinyin,
                         # but we'll try hard to save the situation.
-                        skip()
-                        word = None
-                        break
-                    else:
-                        word = shorten_word
-                        word_len = len(word)
+                        # let's leave non-shorten word and be happy
                 # *word* keeps the word we found.
                 break
         else:
             # loop exited normally, means word not matches pinyin
-            #skip()
-            char_p += 1
+            # but the letter is latin.  so we need to skip all subsequence
+            # latins.  and spaces also.
+            while char_p < plain_s_len and not plain_s[char_p].isspace():
+                char_p += 1
+            while char_p < plain_s_len and plain_s[char_p].isspace():
+                char_p += 1
             word = None
 
         # add word if there's one.
         if word:
             result.append(_range(char_p, word_len))
             char_p += word_len
-        #else:
+        # else:
             # means that a letter is latin, but pinyin not found.
             # skipping already done on for's *else* branch.
 
