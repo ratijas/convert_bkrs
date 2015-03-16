@@ -60,15 +60,6 @@ PINYIN_WRAPPER_CLASS = u'pinYinWrapper'
 TONES_CLASSES = (u"t0", u"t1", u"t2", u"t3", u"t4")
 
 
-def colorize(s):
-    '''colorize(s) --> unicode
-
-    !! obsoleted by ``colorize_DOM``.  use that one instead.
-    '''
-    raise NotImplementedError(
-        "obsoleted by ``colorize_DOM``.  use that one instead.")
-
-
 def ignore_link_and_input_node_filter(node):
     return True
 
@@ -158,7 +149,29 @@ def colorized_HTML_element_from_string(
         string,
         pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
         tones_classes=TONES_CLASSES):
-    return string
+    '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element
+
+    same as ``colorized_HTML_string_from_string``, but returns an
+    ``etree`` Element.
+    '''
+    string = u(string)
+    ranges = ranges_of_pinyin_in_string(string)
+    if not ranges:
+        return string
+    # do a colorize work here
+    import xml.etree.ElementTree as ET
+    prev_end = 0
+    wrapper = ET.Element("span")
+    wrapper.set("class", pinyin_wrapper_class)
+    wrapper.text = string[:ranges[0].location]
+    for i, range in enumerate(ranges):
+        word = range._slice(string)
+        span = ET.SubElement(wrapper, "span")
+        span.set("class", tones_classes[determine_tone(word)])
+        span.text = word
+        if len(ranges) > i + 1:
+            span.tail = string[range.location + range.length:ranges[i+1].location]
+    return wrapper
 
 
 # ---- static vars
@@ -297,6 +310,15 @@ def ranges_of_pinyin_in_string(s):
             # skipping already done on for's *else* branch.
 
     return result
+
+
+def colorize(s):
+    '''colorize(s) --> unicode
+
+    !! obsoleted by ``colorize_DOM``.  use that one instead.
+    '''
+    raise NotImplementedError(
+        "obsoleted by ``colorize_DOM``.  use that one instead.")
 
 
 def search_for_pin_yin_in_string(s):
