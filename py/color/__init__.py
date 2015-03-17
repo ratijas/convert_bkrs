@@ -99,7 +99,14 @@ def colorize_DOM(root_node,
     return value:
         None
     '''
-    pass
+    if node_filter is None:
+        node_filter = lambda: True
+    # loop instead recursion
+    node_stack = [root_node]
+    for child in node_stack[-1]:
+        if node_filter(child):
+            pass
+
 
 
 def uncolorize_DOM(root_node, pinyin_wrapper_class=PINYIN_WRAPPER_CLASS):
@@ -128,19 +135,24 @@ def colorized_HTML_string_from_string(
         inner <span>s with classes set according to contained pinyin
         tone.  these classes can be specified by *tone_classes*
         argument.
+        returns *string* if no pinyin found or all tones are zero.
     '''
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
         return string
+
+    words = map(lambda r: r._slice(string), ranges)
+    tones = map(determine_tone, words)
+    if not any(tones):
+        return string  # all tones are zero, probably it is not pinyin.
+
     # do a colorize work here
     prev_end = 0
     result = u'<span class="%s">' % pinyin_wrapper_class
-    for range in ranges:
+    for range, word, tone in zip(ranges, words, tones):
         result += string[prev_end:range.location]
-        word = range._slice(string)
         # colorize one word
-        tone = determine_tone(word)
         result += u'<span class="{}">{}</span>'.format(
                    tones_classes[tone], word)
         prev_end = range.location + range.length
@@ -152,7 +164,7 @@ def colorized_HTML_element_from_string(
         string,
         pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
         tones_classes=TONES_CLASSES):
-    '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element
+    '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element or *string*
 
     same as ``colorized_HTML_string_from_string``, but returns an
     ``etree.Element``.
@@ -161,7 +173,13 @@ def colorized_HTML_element_from_string(
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
         return string
+
     # do a colorize work here
+    words = map(lambda r: r._slice(string), ranges)
+    tones = map(determine_tone, words)
+    if not any(tones):
+        return string  # all tones are zero, probably it is not pinyin.
+
     import lxml.etree as ET
     prev_end = 0
     wrapper = ET.Element("span")
