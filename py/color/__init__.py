@@ -61,6 +61,8 @@ TONES_CLASSES = (u"t0", u"t1", u"t2", u"t3", u"t4")
 
 
 def ignore_link_and_input_node_filter(node):
+    import xml.etree.ElementTree as ET
+    
     return True
 
 

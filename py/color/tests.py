@@ -13,14 +13,14 @@ _baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
 
 class ignore_link_and_input_node_filter_TestCase(unittest.TestCase):
     def setUp(self):
-        from lxml import etree
-        self.et = etree
+        import xml.etree.ElementTree as ET
+        self.ET = ET
 
 
 class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
     def setUp(self):
-        from lxml import etree
-        self.et = etree
+        import xml.etree.ElementTree as ET
+        self.ET = ET
 
 
 class colorized_HTML_string_TestCase(unittest.TestCase):
@@ -53,8 +53,8 @@ class colorized_HTML_string_TestCase(unittest.TestCase):
 
 class colorized_HTML_element_TestCase(unittest.TestCase):
     def setUp(self):
-        from lxml import etree
-        self.et = etree
+        import xml.etree.ElementTree as ET
+        self.ET = ET
 
 
 class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
