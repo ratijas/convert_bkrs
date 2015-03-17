@@ -61,7 +61,7 @@ TONES_CLASSES = (u"t0", u"t1", u"t2", u"t3", u"t4")
 
 
 def ignore_link_and_input_node_filter(node):
-    import xml.etree.ElementTree as ET
+    import lxml.etree as ET
     if node.tag.lower() in ("a", "input"):
         return False
     return True
@@ -73,7 +73,7 @@ def colorize_DOM(root_node,
                  tones_classes=TONES_CLASSES):
     '''colorize_DOM(root_node, node_filter, pinyin_wrapper_class, tones_classes) --> None
 
-    modify given DOM in place.  using ``lxml.etree``.
+    modify given DOM in place.  using ``etree``.
     detect and colorize pinyin in text nodes of *root_node* and its
     child nodes ignoring nodes for which *node_filter* returns False.
     text nodes will be replaced with <span> wrapper whose class
@@ -82,10 +82,10 @@ def colorize_DOM(root_node,
     *tones_classes* accordingly to the tone of containing pinyin.
 
     parameters:
-        root_node -- instance of ``lxml.etree``.
+        root_node -- instance of ``etree``.
         node_filter -- callable.
             parameters:
-                node -- instance of ``lxml.etree``.
+                node -- instance of ``etree``.
             return value:
                 True to allow function to look up for pinyin inside
                 node itself or its child nodes, otherwise False.
@@ -155,14 +155,14 @@ def colorized_HTML_element_from_string(
     '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element
 
     same as ``colorized_HTML_string_from_string``, but returns an
-    ``etree`` Element.
+    ``etree.Element``.
     '''
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
         return string
     # do a colorize work here
-    import xml.etree.ElementTree as ET
+    import lxml.etree as ET
     prev_end = 0
     wrapper = ET.Element("span")
     wrapper.set("class", pinyin_wrapper_class)

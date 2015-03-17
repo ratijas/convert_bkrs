@@ -2,18 +2,30 @@
 # -*- coding: utf-8 -*-
 '''testing for color.py.'''
 
+import os
 import sys
 import unittest
 
-sys.path.append('../')
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import color
 
 _baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
+_2_baiwen = u'2 bǎiwén'
+_3_nongmingong = u'3 nóngmíngōng'
+_4_kou_anshang = u'4 kǒu’ànshàng'
+_5_kouanshang = u'5 kǒuànshàng'
+_6_fengongsi = u'6 fēngōngsī'
+_7_aiyo = u'7 āiyō'
+_8_shenme = u'8 shénme'
+_9_fadia = u'9 fādiǎ'
+_10_zhiding = u'10 zhǐdìng'
+_11_yi1_yi4 = u'11 yī; yì'
+_12_nanguo_langxingoufei_er_eryide = u'12 nánguò // lángxīngǒufèi // èr’ěryīde'
 
 
 class ignore_link_and_input_node_filter_TestCase(unittest.TestCase):
     def setUp(self):
-        import xml.etree.ElementTree as ET
+        import lxml.etree as ET
         self.ET = ET
         self.cmd = color.ignore_link_and_input_node_filter
     def test_link_tag(self):
@@ -29,42 +41,62 @@ class ignore_link_and_input_node_filter_TestCase(unittest.TestCase):
 
 class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
     def setUp(self):
-        import xml.etree.ElementTree as ET
+        import lxml.etree as ET
         self.ET = ET
 
 
 class colorized_HTML_string_TestCase(unittest.TestCase):
     def test_pairs(self):
         cmd = color.colorized_HTML_string_from_string
-        self.failUnlessEqual(cmd(u'1 bǎiwén'),
-            u'<span class="pinYinWrapper">1 <span class="t3">bǎi</span><span class="t2">wén</span></span>')
         self.failUnlessEqual(cmd(_baiwen),
             u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span> <span class="t4">bù</span><span class="t2">rú</span> <span class="t1">yī</span><span class="t4">jiàn</span> // <span class="t1">fāng</span>’<span class="t4">àn</span> // <span class="t3">fǎn</span><span class="t2">gán</span> // <span class="t2">xú</span><span class="t0">niang</span></span>')
-        self.failUnlessEqual(cmd(u'3 nóngmíngōng'),
+        self.failUnlessEqual(cmd(_2_baiwen),
+            u'<span class="pinYinWrapper">2 <span class="t3">bǎi</span><span class="t2">wén</span></span>')
+        self.failUnlessEqual(cmd(_3_nongmingong),
             u'<span class="pinYinWrapper">3 <span class="t2">nóng</span><span class="t2">mín</span><span class="t1">gōng</span></span>')
-        self.failUnlessEqual(cmd(u'4 kǒu’ànshàng'),
+        self.failUnlessEqual(cmd(_4_kou_anshang),
             u'<span class="pinYinWrapper">4 <span class="t3">kǒu</span>’<span class="t4">àn</span><span class="t4">shàng</span></span>')
-        self.failUnlessEqual(cmd(u'5 kǒuànshàng'),
+        self.failUnlessEqual(cmd(_5_kouanshang),
             u'<span class="pinYinWrapper">5 <span class="t3">kǒu</span><span class="t4">àn</span><span class="t4">shàng</span></span>')
-        self.failUnlessEqual(cmd(u'6 fēngōngsī'),
+        self.failUnlessEqual(cmd(_6_fengongsi),
             u'<span class="pinYinWrapper">6 <span class="t1">fēn</span><span class="t1">gōng</span><span class="t1">sī</span></span>')
-        self.failUnlessEqual(cmd(u'7 āiyō'),
+        self.failUnlessEqual(cmd(_7_aiyo),
             u'<span class="pinYinWrapper">7 <span class="t1">āi</span><span class="t1">yō</span></span>')
-        self.failUnlessEqual(cmd(u'8 shénme'),
+        self.failUnlessEqual(cmd(_8_shenme),
             u'<span class="pinYinWrapper">8 <span class="t2">shén</span><span class="t0">me</span></span>')
-        self.failUnlessEqual(cmd(u'9 fādiǎ'),
+        self.failUnlessEqual(cmd(_9_fadia),
             u'<span class="pinYinWrapper">9 <span class="t1">fā</span><span class="t3">diǎ</span></span>')
-        self.failUnlessEqual(cmd(u'10 zhǐdìng'),
+        self.failUnlessEqual(cmd(_10_zhiding),
             u'<span class="pinYinWrapper">10 <span class="t3">zhǐ</span><span class="t4">dìng</span></span>')
-        self.failUnlessEqual(cmd(u'11. yī; yì'),
-            u'<span class="pinYinWrapper">11. <span class="t1">yī</span>; <span class="t4">yì</span></span>')
-        self.failUnlessEqual(cmd(u'nánguò // lángxīngǒufèi // èr’ěryīde'),
-            u'<span class="pinYinWrapper"><span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
+        self.failUnlessEqual(cmd(_11_yi1_yi4),
+            u'<span class="pinYinWrapper">11 <span class="t1">yī</span>; <span class="t4">yì</span></span>')
+        self.failUnlessEqual(cmd(_12_nanguo_langxingoufei_er_eryide),
+            u'<span class="pinYinWrapper">12 <span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
+
 
 class colorized_HTML_element_TestCase(unittest.TestCase):
+    def should_be(self, text):
+        return self.ET.tostring(
+                self.ET.XML(color.colorized_HTML_string_from_string(text)), encoding='unicode')
+    def cmd(self, text):
+        return self.ET.tostring(color.colorized_HTML_element_from_string(text), encoding='unicode')
     def setUp(self):
-        import xml.etree.ElementTree as ET
+        import lxml.etree as ET
         self.ET = ET
+    def test_pairs(self):
+        for x in [_baiwen,
+                  _2_baiwen,
+                  _3_nongmingong,
+                  _4_kou_anshang,
+                  _5_kouanshang,
+                  _6_fengongsi,
+                  _7_aiyo,
+                  _8_shenme,
+                  _9_fadia,
+                  _10_zhiding,
+                  _11_yi1_yi4,
+                  _12_nanguo_langxingoufei_er_eryide]:
+            self.assertEqual(self.cmd(x), self.should_be(x))
 
 
 class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
@@ -104,6 +136,7 @@ class determine_tone_TestCase(unittest.TestCase):
     def testMixedPinyin(self):
         self.failUnlessEqual(3, color.determine_tone('bǎiwén'))
 
+
 class utilities_TestCase(unittest.TestCase):
     def test_lowercase_string_by_rempoving_pinyin_tones(self):
         cmd = color.lowercase_string_by_removing_pinyin_tones
@@ -114,6 +147,7 @@ class utilities_TestCase(unittest.TestCase):
             ]
         for with_tones, clean in s_list:
             self.failUnlessEqual(cmd(with_tones), clean)
+
 
 if __name__ == '__main__':
     unittest.main()
