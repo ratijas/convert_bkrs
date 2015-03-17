@@ -15,6 +15,16 @@ class ignore_link_and_input_node_filter_TestCase(unittest.TestCase):
     def setUp(self):
         import xml.etree.ElementTree as ET
         self.ET = ET
+        self.cmd = color.ignore_link_and_input_node_filter
+    def test_link_tag(self):
+        link = self.ET.fromstring("""<A HREF='http://bkrs.info/slovo.php?ch=仁'>仁</A>""")
+        self.assertFalse(self.cmd(link))
+    def test_input_tag(self):
+        input = self.ET.fromstring("""<input name="ch" size="20" value="100500" type="hidden" />""")
+        self.assertFalse(self.cmd(input))
+    def test_other(self):
+        tag = self.ET.fromstring("""<div class="py">rén<img class="pointer" src="images/player/negative_small/playup.png" /></div>""")
+        self.assertTrue(self.cmd(tag))
 
 
 class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
