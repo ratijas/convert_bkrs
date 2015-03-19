@@ -39,7 +39,7 @@ import re
 from u import u, utf
 
 __all__ = [
-    'ignore_link_and_input_node_filter',
+    'ignore_links_node_filter',
     'colorize_DOM',
     'uncolorize_DOM',
     'colorized_HTML_string_from_string',
@@ -60,15 +60,14 @@ PINYIN_WRAPPER_CLASS = u'pinYinWrapper'
 TONES_CLASSES = (u"t0", u"t1", u"t2", u"t3", u"t4")
 
 
-def ignore_link_and_input_node_filter(node):
+def ignore_links_node_filter(node):
+    '''ignore_links_node_filter(node) --> False if node's tag is 'a'.'''
     import lxml.etree as ET
-    if node.tag.lower() in ("a", "input"):
-        return False
-    return True
+    return node.tag.lower() != "a"
 
 
 def colorize_DOM(root_node,
-                 node_filter=ignore_link_and_input_node_filter,
+                 node_filter=ignore_links_node_filter,
                  pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
                  tones_classes=TONES_CLASSES):
     '''colorize_DOM(root_node, node_filter, pinyin_wrapper_class, tones_classes) --> None
@@ -101,15 +100,22 @@ def colorize_DOM(root_node,
     '''
     if node_filter is None:
         node_filter = lambda: True
-    # loop instead recursion
-    for child in root_node:
+    # first childtext node stored as .text, others -- as .tail of child elements.
+    count = 1
+    for i, child in enumerate(list(root_node)):
         if node_filter(child):
-            if child.text:
-                new_content = colorized_HTML_element_from_string(child.text)
-                if new_content:
-                    child.text = ''
-                    child.insert  # insert as first element
-
+            colorize_DOM(child, node_filter, pinyin_wrapper_class, tones_classes)
+        if child.tail:
+            elem = colorized_HTML_element_from_string(child.tail, pinyin_wrapper_class, tones_classes)
+            if elem is not None:
+                child.tail = None
+                root_node.insert(i + count, elem)
+                count += 1
+    if root_node.text:
+        elem = colorized_HTML_element_from_string(root_node.text, pinyin_wrapper_class, tones_classes)
+        if elem is not None:
+            root_node.text = None
+            root_node.insert(0, elem)
 
 
 def uncolorize_DOM(root_node, pinyin_wrapper_class=PINYIN_WRAPPER_CLASS):
@@ -118,7 +124,21 @@ def uncolorize_DOM(root_node, pinyin_wrapper_class=PINYIN_WRAPPER_CLASS):
     opposite to ``colorize_DOM``.  replace back wrappers (nodes with
     class equal to *pinyin_wrapper_class*) with contained text.
     '''
-    pass
+    for child in root_node:
+        if child.get('class') == pinyin_wrapper_class:
+            # remove child from root and put it's *inner_text* on that place
+            inner_text = ''.join(child.itertext())
+            previous = child.getprevious()
+            before = previous.tail if (previous is not None and previous.tail) else ''
+            after = child.tail if child.tail else ''
+            new_txt = before + inner_text + after
+            if previous is not None:
+                previous.tail = new_txt
+            else:
+                root_node.text = new_txt
+            root_node.remove(child)
+        else:
+            uncolorize_DOM(child, pinyin_wrapper_class)
 
 
 def colorized_HTML_string_from_string(
@@ -144,6 +164,11 @@ def colorized_HTML_string_from_string(
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
         return None
+
+    pinyin_wrapper_class = u(pinyin_wrapper_class)
+    tones_classes = (u(tones_classes[0]), u(tones_classes[1]),
+                     u(tones_classes[2]), u(tones_classes[3]),
+                     u(tones_classes[4]))
 
     words = map(lambda r: r._slice(string), ranges)
     tones = map(determine_tone, words)
@@ -177,6 +202,11 @@ def colorized_HTML_element_from_string(
     if not ranges:
         return None
 
+    pinyin_wrapper_class = u(pinyin_wrapper_class)
+    tones_classes = (u(tones_classes[0]), u(tones_classes[1]),
+                     u(tones_classes[2]), u(tones_classes[3]),
+                     u(tones_classes[4]))
+
     # do a colorize work here
     words = map(lambda r: r._slice(string), ranges)
     tones = map(determine_tone, words)
@@ -195,6 +225,7 @@ def colorized_HTML_element_from_string(
         span.text = word
         if len(ranges) > i + 1:
             span.tail = string[range.location + range.length:ranges[i+1].location]
+    span.tail = string[range.location + range.length:]
     return wrapper
 
 
