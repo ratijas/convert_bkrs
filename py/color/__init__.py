@@ -102,10 +102,13 @@ def colorize_DOM(root_node,
     if node_filter is None:
         node_filter = lambda: True
     # loop instead recursion
-    node_stack = [root_node]
-    for child in node_stack[-1]:
+    for child in root_node:
         if node_filter(child):
-            pass
+            if child.text:
+                new_content = colorized_HTML_element_from_string(child.text)
+                if new_content:
+                    child.text = ''
+                    child.insert  # insert as first element
 
 
 
@@ -135,17 +138,17 @@ def colorized_HTML_string_from_string(
         inner <span>s with classes set according to contained pinyin
         tone.  these classes can be specified by *tone_classes*
         argument.
-        returns *string* if no pinyin found or all tones are zero.
+        returns None if no pinyin found or all tones are zero.
     '''
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
-        return string
+        return None
 
     words = map(lambda r: r._slice(string), ranges)
     tones = map(determine_tone, words)
     if not any(tones):
-        return string  # all tones are zero, probably it is not pinyin.
+        return None  # all tones are zero, probably it is not pinyin.
 
     # do a colorize work here
     prev_end = 0
@@ -167,18 +170,18 @@ def colorized_HTML_element_from_string(
     '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element or *string*
 
     same as ``colorized_HTML_string_from_string``, but returns an
-    ``etree.Element``.
+    ``etree.Element`` or None.
     '''
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
-        return string
+        return None
 
     # do a colorize work here
     words = map(lambda r: r._slice(string), ranges)
     tones = map(determine_tone, words)
     if not any(tones):
-        return string  # all tones are zero, probably it is not pinyin.
+        return None  # all tones are zero, probably it is not pinyin.
 
     import lxml.etree as ET
     prev_end = 0

@@ -72,23 +72,20 @@ class colorized_HTML_string_TestCase(unittest.TestCase):
             u'<span class="pinYinWrapper">11 <span class="t1">yī</span>; <span class="t4">yì</span></span>')
         self.failUnlessEqual(cmd(_12_nanguo_langxingoufei_er_eryide),
             u'<span class="pinYinWrapper">12 <span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
-        self.failUnlessEqual(cmd('nothing here.'),
-            u'nothing here.')
+        self.failUnlessEqual(cmd('nothing here.'), None)
 
 
 class colorized_HTML_element_TestCase(unittest.TestCase):
     def should_be(self, text):
         result = color.colorized_HTML_string_from_string(text)
-        if isinstance(result, basestring):
-            return result
-        else:
+        if result is not None:
             return self.ET.tostring(self.ET.XML(result), encoding='unicode')
+        return text
     def cmd(self, text):
         result = color.colorized_HTML_element_from_string(text)
-        if isinstance(result, basestring):
-            return result
-        else:
+        if result is not None:
             return self.ET.tostring(result, encoding='unicode')
+        return text
     def setUp(self):
         import lxml.etree as ET
         self.ET = ET
