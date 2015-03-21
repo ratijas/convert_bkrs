@@ -29,9 +29,11 @@ class ignore_links_node_filter_TestCase(unittest.TestCase):
         import lxml.etree as ET
         self.ET = ET
         self.cmd = color.ignore_links_node_filter
+
     def test_link_tag(self):
         link = self.ET.fromstring("""<A HREF='http://bkrs.info/slovo.php?ch=仁'>仁</A>""")
         self.assertFalse(self.cmd(link))
+
     def test_other(self):
         tag = self.ET.fromstring("""<div class="py">rén<img class="pointer" src="images/player/negative_small/playup.png" /></div>""")
         self.assertTrue(self.cmd(tag))
@@ -51,8 +53,7 @@ class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
 <div class="m2"><div class="ex">функциональная ценность денег - 货币的职能价值</div></div>
 <div>3) <i class="green">мат.</i> 函数[的] hánshù[de], 函数式[的] hánshùshì[de]</div>
 </div>''')
-        html_expected = self.ET.tostring(self.ET.fromstring(
-        u'''<div class="ch_ru"><div><span class="pinYinWrapper">1) 从属[的] <span class="t2">cóng</span><span class="t3">shǔ</span>[<span class="t0">de</span>]</span></div>
+        html_expected = self.ET.tostring(self.ET.fromstring(u'''<div class="ch_ru"><div><span class="pinYinWrapper">1) 从属[的] <span class="t2">cóng</span><span class="t3">shǔ</span>[<span class="t0">de</span>]</span></div>
 <div class="m2"><div class="ex">функциональные отношения - 从属关系</div></div>
 <div><span class="pinYinWrapper">2) 机能[的] <span class="t1">jī</span><span class="t2">néng</span>[<span class="t0">de</span>], 宫能[的] <span class="t1">guān</span><span class="t2">néng</span>[-<span class="t0">de</span>]; 职能[的] <span class="t2">zhí</span><span class="t2">néng</span>[<span class="t0">de</span>]</span></div>
 <div class="m2"><div class="ex">функциональное заболевание - 官能[性]病</div></div>
@@ -137,32 +138,19 @@ class colorize_uncolorize_DOM_TestCase(unittest.TestCase):
 class colorized_HTML_string_TestCase(unittest.TestCase):
     def test_pairs(self):
         cmd = color.colorized_HTML_string_from_string
-        self.failUnlessEqual(cmd(_baiwen),
-            u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span> <span class="t4">bù</span><span class="t2">rú</span> <span class="t1">yī</span><span class="t4">jiàn</span> // <span class="t1">fāng</span>’<span class="t4">àn</span> // <span class="t3">fǎn</span><span class="t2">gán</span> // <span class="t2">xú</span><span class="t0">niang</span></span>')
-        self.failUnlessEqual(cmd(_2_baiwen),
-            u'<span class="pinYinWrapper">2 <span class="t3">bǎi</span><span class="t2">wén</span></span>')
-        self.failUnlessEqual(cmd(_3_nongmingong),
-            u'<span class="pinYinWrapper">3 <span class="t2">nóng</span><span class="t2">mín</span><span class="t1">gōng</span></span>')
-        self.failUnlessEqual(cmd(_4_kou_anshang),
-            u'<span class="pinYinWrapper">4 <span class="t3">kǒu</span>’<span class="t4">àn</span><span class="t4">shàng</span></span>')
-        self.failUnlessEqual(cmd(_5_kouanshang),
-            u'<span class="pinYinWrapper">5 <span class="t3">kǒu</span><span class="t4">àn</span><span class="t4">shàng</span></span>')
-        self.failUnlessEqual(cmd(_6_fengongsi),
-            u'<span class="pinYinWrapper">6 <span class="t1">fēn</span><span class="t1">gōng</span><span class="t1">sī</span></span>')
-        self.failUnlessEqual(cmd(_7_aiyo),
-            u'<span class="pinYinWrapper">7 <span class="t1">āi</span><span class="t1">yō</span></span>')
-        self.failUnlessEqual(cmd(_8_shenme),
-            u'<span class="pinYinWrapper">8 <span class="t2">shén</span><span class="t0">me</span></span>')
-        self.failUnlessEqual(cmd(_9_fadia),
-            u'<span class="pinYinWrapper">9 <span class="t1">fā</span><span class="t3">diǎ</span></span>')
-        self.failUnlessEqual(cmd(_10_zhiding),
-            u'<span class="pinYinWrapper">10 <span class="t3">zhǐ</span><span class="t4">dìng</span></span>')
-        self.failUnlessEqual(cmd(_11_yi1_yi4),
-            u'<span class="pinYinWrapper">11 <span class="t1">yī</span>; <span class="t4">yì</span></span>')
-        self.failUnlessEqual(cmd(_12_nanguo_langxingoufei_er_eryide),
-            u'<span class="pinYinWrapper">12 <span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
-        self.failUnlessEqual(cmd(_13_trailing),
-            u'<span class="pinYinWrapper"><span class="t2">hán</span><span class="t4">shù</span><span class="t4">shì</span>[<span class="t0">de</span>]</span>')
+        self.failUnlessEqual(cmd(_baiwen), u'<span class="pinYinWrapper"><span class="t3">bǎi</span><span class="t2">wén</span> <span class="t4">bù</span><span class="t2">rú</span> <span class="t1">yī</span><span class="t4">jiàn</span> // <span class="t1">fāng</span>’<span class="t4">àn</span> // <span class="t3">fǎn</span><span class="t2">gán</span> // <span class="t2">xú</span><span class="t0">niang</span></span>')
+        self.failUnlessEqual(cmd(_2_baiwen), u'<span class="pinYinWrapper">2 <span class="t3">bǎi</span><span class="t2">wén</span></span>')
+        self.failUnlessEqual(cmd(_3_nongmingong), u'<span class="pinYinWrapper">3 <span class="t2">nóng</span><span class="t2">mín</span><span class="t1">gōng</span></span>')
+        self.failUnlessEqual(cmd(_4_kou_anshang), u'<span class="pinYinWrapper">4 <span class="t3">kǒu</span>’<span class="t4">àn</span><span class="t4">shàng</span></span>')
+        self.failUnlessEqual(cmd(_5_kouanshang), u'<span class="pinYinWrapper">5 <span class="t3">kǒu</span><span class="t4">àn</span><span class="t4">shàng</span></span>')
+        self.failUnlessEqual(cmd(_6_fengongsi), u'<span class="pinYinWrapper">6 <span class="t1">fēn</span><span class="t1">gōng</span><span class="t1">sī</span></span>')
+        self.failUnlessEqual(cmd(_7_aiyo), u'<span class="pinYinWrapper">7 <span class="t1">āi</span><span class="t1">yō</span></span>')
+        self.failUnlessEqual(cmd(_8_shenme), u'<span class="pinYinWrapper">8 <span class="t2">shén</span><span class="t0">me</span></span>')
+        self.failUnlessEqual(cmd(_9_fadia), u'<span class="pinYinWrapper">9 <span class="t1">fā</span><span class="t3">diǎ</span></span>')
+        self.failUnlessEqual(cmd(_10_zhiding), u'<span class="pinYinWrapper">10 <span class="t3">zhǐ</span><span class="t4">dìng</span></span>')
+        self.failUnlessEqual(cmd(_11_yi1_yi4), u'<span class="pinYinWrapper">11 <span class="t1">yī</span>; <span class="t4">yì</span></span>')
+        self.failUnlessEqual(cmd(_12_nanguo_langxingoufei_er_eryide), u'<span class="pinYinWrapper">12 <span class="t2">nán</span><span class="t4">guò</span> // <span class="t2">láng</span><span class="t1">xīn</span><span class="t3">gǒu</span><span class="t4">fèi</span> // <span class="t4">èr</span>’<span class="t3">ěr</span><span class="t1">yī</span><span class="t0">de</span></span>')
+        self.failUnlessEqual(cmd(_13_trailing), u'<span class="pinYinWrapper"><span class="t2">hán</span><span class="t4">shù</span><span class="t4">shì</span>[<span class="t0">de</span>]</span>')
         self.failUnlessEqual(cmd('nothing here.'), None)
 
 
@@ -172,14 +160,17 @@ class colorized_HTML_element_TestCase(unittest.TestCase):
         if result is not None:
             return self.ET.tostring(self.ET.XML(result), encoding='unicode')
         return text
+
     def cmd(self, text):
         result = color.colorized_HTML_element_from_string(text)
         if result is not None:
             return self.ET.tostring(result, encoding='unicode')
         return text
+
     def setUp(self):
         import lxml.etree as ET
         self.ET = ET
+
     def test_pairs(self):
         for x in [_baiwen,
                   _2_baiwen,
@@ -201,37 +192,47 @@ class colorized_HTML_element_TestCase(unittest.TestCase):
 class ranges_of_pinyin_in_string_TestCase(unittest.TestCase):
     def setUp(self):
         self._cmd = color.ranges_of_pinyin_in_string
+
     def test_one_word(self):
         self.failUnlessEqual(self._cmd(u"bǎi"), [(0, 3)])
         self.failUnlessEqual(self._cmd(u" jiàn."), [(1, 4)])
         self.failUnlessEqual(self._cmd(u"...-niang, ..."), [(4, 5)])
+
     def test_two_words(self):
         ranges = self._cmd(u"Gōngzuò")
         self.failUnlessEqual(ranges, [(0, 4), (4, 3)])
+
     def test_baiwen_buru_yijian(self):
         ranges = self._cmd(_baiwen)
-        self.failUnlessEqual(ranges, [(0,3), (3,3), (7,2), (9,2), (12,2),
-            (14,4), (22,4), (27,2), (33,3), (36,3), (43,2), (45,5)])
+        self.failUnlessEqual(ranges, [
+            (0, 3), (3, 3), (7, 2), (9, 2), (12, 2), (14, 4),
+            (22, 4), (27, 2), (33, 3), (36, 3), (43, 2), (45, 5)])
 
 
 class determine_tone_TestCase(unittest.TestCase):
     def testFristTone(self):
         self.failUnlessEqual(1, color.determine_tone('fāng'))
         self.failUnlessEqual(1, color.determine_tone('yī'))
+
     def testSecondTone(self):
         self.failUnlessEqual(2, color.determine_tone('gán'))
         self.failUnlessEqual(2, color.determine_tone('xún'))
+
     def testThirdTone(self):
         self.failUnlessEqual(3, color.determine_tone('fǎn'))
         self.failUnlessEqual(3, color.determine_tone('lǚ'))
+
     def testFourthTone(self, ):
         self.failUnlessEqual(4, color.determine_tone('àn'))
         self.failUnlessEqual(4, color.determine_tone('dìnggòu'))
+
     def testZeroTone(self):
         self.failUnlessEqual(0, color.determine_tone('de'))
         self.failUnlessEqual(0, color.determine_tone('ning'))
+
     def testNonPinyin(self):
         self.failUnlessEqual(0, color.determine_tone('бурда'))
+
     def testMixedPinyin(self):
         self.failUnlessEqual(3, color.determine_tone('bǎiwén'))
 

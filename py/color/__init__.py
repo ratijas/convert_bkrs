@@ -33,12 +33,17 @@ constants:
 PINYIN_LIST -- specially sorted list of all possible pinyin words.
 
 PINYIN_WRAPPER_CLASS -- default class used by ``[un]colorize_DOM``.
+
+classes:
+
+Range -- 2-named-tuple with [0] location and [1] length.
 '''
 
 import re
 from u import u, utf
 
 __all__ = [
+    'Range',
     'ignore_links_node_filter',
     'colorize_DOM',
     'uncolorize_DOM',
@@ -100,7 +105,8 @@ def colorize_DOM(root_node,
     '''
     if node_filter is None:
         node_filter = lambda: True
-    # first childtext node stored as .text, others -- as .tail of child elements.
+    # first childtext node stored as .text
+    # others -- as .tail of child elements.
     count = 1
     for i, child in enumerate(list(root_node)):
         if node_filter(child):
@@ -181,8 +187,7 @@ def colorized_HTML_string_from_string(
     for range, word, tone in zip(ranges, words, tones):
         result += string[prev_end:range.location]
         # colorize one word
-        result += u'<span class="{}">{}</span>'.format(
-                   tones_classes[tone], word)
+        result += u'<span class="{}">{}</span>'.format(tones_classes[tone], word)
         prev_end = range.location + range.length
     result += string[prev_end:] + u"</span>"
     return result
@@ -238,6 +243,7 @@ _diacritics = (
     (u'īíǐì',     u'i')
 )
 
+
 def lowercase_string_by_removing_pinyin_tones(s):
     '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
 
@@ -251,12 +257,12 @@ def lowercase_string_by_removing_pinyin_tones(s):
     return s
 
 
-
 # ---- static vars
 _t1 = u"āēūǖīō"
 _t2 = u"áéúǘíó"
 _t3 = u"ǎăěǔǚǐǒ"
 _t4 = u"àèùǜìò"
+
 
 def determine_tone(pinyin):
     '''determine_tone(string) --> {0..4}
@@ -279,15 +285,21 @@ def determine_tone(pinyin):
     return 0
 
 
-# ---- static vars
+# Range class.  quite like Cocoa's NSRange.
 from collections import namedtuple
-_range = namedtuple("_range", ("location", "length"))
+
+Range = namedtuple("Range", ("location", "length"))
+
+del namedtuple
+
+
 def _slice(self, obj):
-    return obj[self.location : self.location + self.length]
-_range._slice = _slice
+    return obj[self.location:self.location + self.length]
+Range._slice = _slice
+
 
 def ranges_of_pinyin_in_string(s):
-    '''ranges_of_pinyin_in_string(string) --> list<_range>
+    '''ranges_of_pinyin_in_string(string) --> list<Range>
 
     !! replacing obsolete ``search_for_pin_yin_in_string``.
 
@@ -297,7 +309,7 @@ def ranges_of_pinyin_in_string(s):
 
     return value:
         list of ranges of pinyin,
-        where ``_range`` is 2-namedtuple of (location, length).
+        where ``Range`` is 2-namedtuple of (location, length).
         list can be empty.
     '''
     result = []
@@ -322,7 +334,7 @@ def ranges_of_pinyin_in_string(s):
         for word in PINYIN_LIST:
             word_len = len(word)
 
-            if plain_s[char_p : char_p + word_len] == word:
+            if plain_s[char_p:char_p + word_len] == word:
                 # rule of apostrophe in pinyin:
                 #   "'" must be before 'a', 'e' and 'o'.
                 #
@@ -332,7 +344,7 @@ def ranges_of_pinyin_in_string(s):
                 # remember that a pinyin never begins with 'i' or 'u',
                 #   and 'v' already replaced with space before the loop.
                 if char_p + word_len + 1 < plain_s_len and\
-                    plain_s[char_p + word_len] in 'aoeiu':
+                   plain_s[char_p + word_len] in 'aoeiu':
 
                     shorten_word = word[:-1]
 
@@ -358,7 +370,7 @@ def ranges_of_pinyin_in_string(s):
 
         # add word if there's one.
         if word:
-            result.append(_range(char_p, word_len))
+            result.append(Range(char_p, word_len))
             char_p += word_len
         # else:
             # means that a letter is latin, but pinyin not found.
