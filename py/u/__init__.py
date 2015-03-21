@@ -3,6 +3,7 @@
 
 __all__ = ('u', 'utf')
 
+
 def u(s):
     "convert anything to unicode"
     if isinstance(s, unicode):
@@ -13,6 +14,7 @@ def u(s):
         s = str(s)
         s = s.decode("utf-8")
     return s
+
 
 def utf(s):
     "convert anything to utf-8"
