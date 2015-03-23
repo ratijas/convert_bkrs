@@ -6,8 +6,10 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# dirty hack to import from up-folder.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import color
+del sys.path[0]
 
 _baiwen = u'bǎiwén bùrú yījiàn // fāng’àn // fǎngán // xúniang'
 _2_baiwen = u'2 bǎiwén'

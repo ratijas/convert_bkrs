@@ -40,7 +40,13 @@ Range -- 2-named-tuple with [0] location and [1] length.
 '''
 
 import re
+
+# dirty hack to import from up-folder.
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from u import u, utf
+del sys.path[0], os, sys
 
 __all__ = [
     'Range',
