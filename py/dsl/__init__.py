@@ -11,22 +11,29 @@ converter takes advantage of dsl concepts:
 working well with unicode (module ``u`` is recommended).
 extensible by plug-ins API.
 
-``dslDictionaryConverter`` has abstract parameters like *source* and
-*target*.  although it don't know nothing about what to do with them
-and what kind of they are, it let concrete subclasses to decide how to
-generate new dictionary template.
+``dslDictionaryConverter`` is the first thing you should look at.
+it has abstract parameters like *source* and *target*.  although it
+don't know nothing about what to do with them and what kind of they
+are, it let concrete subclasses to decide how to generate new
+dictionary template.
+
+take a look at class's documentation for more information on
+subclassing and extending with plug-ins.
+
+in simplest case you need to write only two classes: custom plug-ins
+derived from ``dslDictionaryPlugin`` and ``dslEntryPlugin``
+
+
+``dslEntryConverter`` is the next big thing.  this is where most of
+job is performing.  unless you need to parse some dialect of dsl or
+in other way customize entry's fields, usually you don't need to modify
+these class.  just initialize it with suitable plug-in.
+
 """
 
 __all__ = [
-    'dslDictionaryConverter'
+    'dslDictionaryConverter',
+    'dslEntryConverter',
     ]
 
 from .dsl_dictionary_converter import dslDictionaryConverter
-
-# from dsl_dictionary        import dslDictionary
-# from dsl_dictionary_plugin import dslDictionaryPlugin
-# from dsl_entry        import dslEntry
-# from dsl_entry_plugin import dslEntryPlugin
-
-# import time
-# from format_time_report import format_time_report
