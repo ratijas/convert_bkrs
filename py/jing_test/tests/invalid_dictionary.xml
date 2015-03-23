@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<d:dictionary xmlns="http://www.w3.org/1999/xhtml" xmlns:d="http://www.apple.com/DTDs/DictionaryService-1.0.rng">
+    <d:entry id="make_1">
+        <!-- no index! -->
+        <h1>make</h1><span class="syntax">| māk |</span>
+        <div>
+                <ol>
+                        <li>
+                                Form by putting parts together or combining substances; construct; create; produce
+                                <span d:priority="2"> : <i>Mother made <div><!-- div inside i -->her</div> a beautiful dress</i>
+                                </span>
+                                .
+                            </li>
+                        <li>
+                                Cause to be or become
+                                <span d:priority="2"> : <i>The news made me happy</i>
+                                </span>
+                                .
+                            </li>
+                    </ol>
+            </div>
+        <div d:parental-control="1" d:priority="2">
+                <h3>PHRASES</h3>
+                <div id="make_it"><b>make it</b> : succeed in something; survive.</div>
+                <h4><a href="x-dictionary:r:make_up_ones_mind"><b>make up one's mind</b></a></h4>
+            </div>
+        </d:entry>
+        <d:something /> <!-- random tag -->
+</d:dictionary>
