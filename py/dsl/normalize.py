@@ -1,37 +1,49 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 '''
-модуль normalize
+various tools for standardize headers, strings and indentifiers.
 
-удалить пробелы в начале, в конце, а также заменить смежные пробелы на один
+- stripping spaces from front and back, and removing multiple
+  contiguous spaces;
+- generating *stable* id from string;
+- working with ambiguous headers like "make up[ one's] mind".
 '''
 
+from __future__ import unicode_literals
 import re
-from u import *
+
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from u import u, utf
+del sys.path[0], os, sys
 
 try:
 	from unidecode import unidecode
-except ImportError as e:
+except ImportError, e:
 	import sys
-	print >>sys.stderr, '''
-модуль 'unidecode' не установлен на этой машине.
-ты можешь скачать его с оффициального сайта питона
+	print >>sys.stderr, """
+module ``unidecode`` is not installed.
+you can download it manually from the link bellow:
 https://pypi.python.org/packages/source/U/Unidecode/Unidecode-0.04.14.tar.gz
-'''
-	exit(1)
+or from install by apt-get if you have one:
+sudo apt-get install python-unidecode
+"""
+	# raise
+
+__all__ = [
+    'spaces',
+    ]
 
 
-def spaces():
-	# глобальная переменная, только для ф-ции spaces
-	space_re = re.compile( ur'( |\t){2,}', re.UNICODE )
+# ---- static vars
+spaces_re = re.compile(ur'( |\t){2,}', re.UNICODE)
 
-	def spaces( s ):
-		'''
-		обрезать пробелы внале и вконце, заменить повторяющиеся пробелы и табуляции на один пробел
-		'''
-		return u( re.sub( space_re, u' ', u( s ).strip() ))
-	return spaces
-spaces = spaces()
+def spaces(s):
+    """strip off leading and trailing whitespaces,
+    and replace contiguous whitespaces with just one.
+    """
+    return re.sub(spaces_re, u' ', u(s).strip())
+
 
 def brackets():
 	re_sub = (

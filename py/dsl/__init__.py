@@ -1,64 +1,32 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+"""
+abstract dictionary converter based on dsl.
 
-from dsl_dictionary        import dslDictionary
-from dsl_dictionary_plugin import dslDictionaryPlugin
-from dsl_entry        import dslEntry
-from dsl_entry_plugin import dslEntryPlugin
+converter takes advantage of dsl concepts:
+    - line-based input;
+    - headers, usually to be found at the top of file;
+    - importing, for dictionaries that are splitted into many files;
+    - processing entries one by one.
 
-import time
-from format_time_report import format_time_report
+working well with unicode (module ``u`` is recommended).
+extensible by plug-ins API.
 
+``dslDictionaryConverter`` has abstract parameters like *source* and
+*target*.  although it don't know nothing about what to do with them
+and what kind of they are, it let concrete subclasses to decide how to
+generate new dictionary template.
+"""
 
-#########################
-DEBUG_MODE = False		#
-#########################
+__all__ = [
+    'dslDictionaryConverter'
+    ]
 
-INFILE = 'infile'
-OUTFILE = 'outfile'
-DICTIONARY_PLUGIN_CLASS = 'dictionary_plugin_class'
-ENTRY_PLUGIN_CLASS = 'entry_plugin_class'
+from .dsl_dictionary_converter import dslDictionaryConverter
 
-# глобальные переменные -- зло
-# нужно вынести в замыкние
-app_data = {}
+# from dsl_dictionary        import dslDictionary
+# from dsl_dictionary_plugin import dslDictionaryPlugin
+# from dsl_entry        import dslEntry
+# from dsl_entry_plugin import dslEntryPlugin
 
-def set_app_data( data ):
-	'''
-	set_app_data({ data1: val1, ...})
-
-	требуемые параметры:
-		INFILE
-		OUTFILE
-		DICTIONARY_PLUGIN_CLASS
-		ENTRY_PLUGIN_CLASS
-	'''
-	global app_data
-	app_data[ INFILE ] = data[ INFILE ]
-	app_data[ OUTFILE ] = data[ OUTFILE ]
-	app_data[ DICTIONARY_PLUGIN_CLASS ] = data[ DICTIONARY_PLUGIN_CLASS ]
-	app_data[ ENTRY_PLUGIN_CLASS ] = data[ ENTRY_PLUGIN_CLASS ]
-
-
-def convert():
-	time_begin = time.time()
-	time_init  = None
-	time_end   = None
-
-	e = dslEntry(
-		plugin = app_data[ ENTRY_PLUGIN_CLASS ]()
-	)
-
-	d = dslDictionary(
-		plugin = app_data[ DICTIONARY_PLUGIN_CLASS ](),
-		infile = app_data[ INFILE ],
-		outfile = app_data[ OUTFILE ],
-		entry_instance = e
-	)
-
-	time_init = time.time()
-
-	cnt = d.convert()
-
-	time_end = time.time()
-	format_time_report( time_begin, time_init, time_end, cnt )
+# import time
+# from format_time_report import format_time_report
