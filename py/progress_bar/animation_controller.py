@@ -76,7 +76,7 @@ def AnimationTimingLinear(progress):
 
 
 def AnimationTimingEase(progress):
-    "quite like cubic_bezier(0.25, 0.1, 0.25, 1)"
+    """quite like cubic_bezier(0.25, 0.1, 0.25, 1)"""
     if progress == 1:
         return 1
     q = 0.07813 - progress / 2
@@ -91,12 +91,12 @@ def AnimationTimingEase(progress):
 
 
 def AnimationTimingEaseIn(progress):
-    "quite like cubic_bezier(0.42, 0, 1, 1)"
+    """quite like cubic_bezier(0.42, 0, 1, 1)"""
     return progress ** 1.7
 
 
 def AnimationTimingEaseOut(progress):
-    "quite like cubic_bezier(0, 0.58, 1, 1)"
+    """quite like cubic_bezier(0, 0.58, 1, 1)"""
     return progress ** 0.48
 
 
@@ -114,12 +114,12 @@ def AnimationTimingEaseInOut(progress):
 
 
 def AnimationTimingQuad(progress):
-    "square the progress value"
+    """square the progress value"""
     return progress ** 2
 
 
 def AnimationTimingBounce(progress):
-    "bounces four times, reaches end on the last."
+    """bounces four times, reaches end on the last."""
     a = 0
     b = 1
     while True:

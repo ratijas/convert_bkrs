@@ -25,22 +25,21 @@ class dslDictionaryConverter(object):
         self.target = target
         self.entry_plugin = entry_plugin
 
-
     def convert():
         import time
         time_begin = time.time()
-        time_init  = None
-        time_end   = None
+        time_init = None
+        time_end = None
 
         e = dslEntry(
-            plugin = app_data[ ENTRY_PLUGIN_CLASS ]()
+            plugin=app_data[ENTRY_PLUGIN_CLASS]()
         )
 
         d = dslDictionary(
-            plugin = app_data[ DICTIONARY_PLUGIN_CLASS ](),
-            infile = app_data[ INFILE ],
-            outfile = app_data[ OUTFILE ],
-            entry_instance = e
+            plugin=app_data[DICTIONARY_PLUGIN_CLASS](),
+            infile=app_data[INFILE],
+            outfile=app_data[OUTFILE],
+            entry_instance=e
         )
 
         time_init = time.time()

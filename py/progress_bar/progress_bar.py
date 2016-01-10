@@ -41,7 +41,7 @@ class ProgressBar(object):
         return self._width
 
     def label_width_max(self):
-        'максимальная длина крайних значений в виде строк'
+        """максимальная длина крайних значений в виде строк"""
         return max(map(lambda x: len(str(int(x()))),
                    (self.min, self.max, self.value)))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-'''searching for pinyin and wrap it with HTML.
+"""searching for pinyin and wrap it with HTML.
 
 module provides some useful functions for working with Chinese pinyin,
 "phonetic system for transcribing the Mandarin pronunciations of
@@ -37,15 +37,16 @@ PINYIN_WRAPPER_CLASS -- default class used by ``[un]colorize_DOM``.
 classes:
 
 Range -- 2-named-tuple with [0] location and [1] length.
-'''
+"""
 
 import re
-
 # dirty hack to import from up-folder.
 import sys
 import os
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from u import u, utf
+
 del sys.path[0], os, sys
 
 __all__ = [
@@ -61,9 +62,10 @@ __all__ = [
     'PINYIN_LIST',
     'PINYIN_WRAPPER_CLASS',
     'TONES_CLASSES',
-    ]
+]
 
-PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,dia,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yo,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,me,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(',')
+PINYIN_LIST = u'zhuang,shuang,chuang,zhuan,zhuai,zhong,zheng,zhang,xiong,xiang,shuan,shuai,sheng,shang,qiong,qiang,niang,liang,kuang,jiong,jiang,huang,guang,chuan,chuai,chong,cheng,chang,zuan,zong,zhuo,zhun,zhui,zhua,zhou,zhen,zhei,zhao,zhan,zhai,zeng,zang,yuan,yong,ying,yang,xuan,xing,xiao,xian,weng,wang,tuan,tong,ting,tiao,tian,teng,tang,suan,song,shuo,shun,shui,shua,shou,shen,shei,shao,shan,shai,seng,sang,ruan,rong,reng,rang,quan,qing,qiao,qian,ping,piao,pian,peng,pang,nüe,nuan,nong,ning,niao,nian,neng,nang,ming,miao,mian,meng,mang,lüe,luan,long,ling,liao,lian,leng,lang,kuan,kuai,kong,keng,kang,juan,jing,jiao,jian,huan,huai,hong,heng,hang,guan,guai,gong,geng,gang,feng,fang,duan,dong,ding,diao,dian,deng,dang,cuan,cong,chuo,chun,chui,chua,chou,chen,chao,chan,chai,ceng,cang,bing,biao,bian,beng,bang,zuo,zun,zui,zou,zhu,zhi,zhe,zha,zen,zei,zao,zan,zai,yun,yue,you,yin,yao,yan,xun,xue,xiu,xin,xie,xia,wen,wei,wan,wai,tuo,tun,tui,tou,tie,tao,tan,tai,suo,sun,sui,sou,shu,shi,she,sha,sen,sei,sao,san,sai,ruo,run,rui,rua,rou,ren,rao,ran,qun,que,qiu,qin,qie,qia,pou,pin,pie,pen,pei,pao,pan,pai,nü,nuo,nou,niu,nin,nie,nen,nei,nao,nan,nai,mou,miu,min,mie,men,mei,mao,man,mai,lü,luo,lun,lou,liu,lin,lie,lia,lei,lao,lan,lai,kuo,kun,kui,kua,kou,ken,kei,kao,kan,kai,jun,jue,jiu,jin,jie,jia,huo,hun,hui,hua,hou,hen,hei,hao,han,hai,guo,gun,gui,gua,gou,gen,gei,gao,gan,gai,fou,fen,fei,fan,duo,dun,dui,dou,diu,die,dia,den,dei,dao,dan,dai,cuo,cun,cui,cou,chu,chi,che,cha,cen,cao,can,cai,bin,bie,ben,bei,bao,ban,bai,ang,zu,zi,ze,za,yu,yo,yi,ye,ya,xu,xi,wu,wo,wa,tu,ti,te,ta,su,si,se,sa,ru,ri,re,qu,qi,pu,po,pi,pa,ou,nu,ni,ng,ne,na,mu,mo,mi,me,ma,lu,li,le,la,ku,ke,ka,ju,ji,hu,he,ha,gu,ge,ga,fu,fo,fa,er,en,ei,du,di,de,da,cu,ci,ce,ca,bu,bo,bi,ba,ao,an,ai,o,n,m,e,a,r'.split(
+    ',')
 # sorted by length, so first look up the longest variant.
 
 PINYIN_WRAPPER_CLASS = u'pinYinWrapper'
@@ -72,7 +74,7 @@ TONES_CLASSES = (u"t0", u"t1", u"t2", u"t3", u"t4")
 
 
 def ignore_links_node_filter(node):
-    '''ignore_links_node_filter(node) --> False if node's tag is 'a'.'''
+    """ignore_links_node_filter(node) --> False if node's tag is 'a'."""
     import lxml.etree as ET
     return node.tag.lower() != "a"
 
@@ -81,7 +83,7 @@ def colorize_DOM(root_node,
                  node_filter=ignore_links_node_filter,
                  pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
                  tones_classes=TONES_CLASSES):
-    '''colorize_DOM(root_node, node_filter, pinyin_wrapper_class, tones_classes) --> None
+    """colorize_DOM(root_node, node_filter, pinyin_wrapper_class, tones_classes) --> None
 
     modify given DOM in place.  using ``etree``.
     detect and colorize pinyin in text nodes of *root_node* and its
@@ -108,7 +110,7 @@ def colorize_DOM(root_node,
 
     return value:
         None
-    '''
+    """
     if node_filter is None:
         node_filter = lambda: True
     # first childtext node stored as .text
@@ -131,11 +133,11 @@ def colorize_DOM(root_node,
 
 
 def uncolorize_DOM(root_node, pinyin_wrapper_class=PINYIN_WRAPPER_CLASS):
-    '''uncolorize_DOM(root_node, pinyin_wrapper_class) --> None
+    """uncolorize_DOM(root_node, pinyin_wrapper_class) --> None
 
     opposite to ``colorize_DOM``.  replace back wrappers (nodes with
     class equal to *pinyin_wrapper_class*) with contained text.
-    '''
+    """
     for child in root_node:
         if child.get('class') == pinyin_wrapper_class:
             # remove child from root and put it's *inner_text* on that place
@@ -157,7 +159,7 @@ def colorized_HTML_string_from_string(
         string,
         pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
         tones_classes=TONES_CLASSES):
-    '''colorized_HTML_string_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> unicode
+    """colorized_HTML_string_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> unicode
 
     !! replacing obsolete ``colorize_pin_yin``.
 
@@ -171,7 +173,7 @@ def colorized_HTML_string_from_string(
         tone.  these classes can be specified by *tone_classes*
         argument.
         returns None if no pinyin found or all tones are zero.
-    '''
+    """
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
@@ -203,11 +205,11 @@ def colorized_HTML_element_from_string(
         string,
         pinyin_wrapper_class=PINYIN_WRAPPER_CLASS,
         tones_classes=TONES_CLASSES):
-    '''colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element or *string*
+    """colorized_HTML_element_from_string(string[, pinyin_wrapper_class][, tones_classes]) --> etree.Element or *string*
 
     same as ``colorized_HTML_string_from_string``, but returns an
     ``etree.Element`` or None.
-    '''
+    """
     string = u(string)
     ranges = ranges_of_pinyin_in_string(string)
     if not ranges:
@@ -235,27 +237,27 @@ def colorized_HTML_element_from_string(
         span.set("class", tones_classes[determine_tone(word)])
         span.text = word
         if len(ranges) > i + 1:
-            span.tail = string[range.location + range.length:ranges[i+1].location]
+            span.tail = string[range.location + range.length:ranges[i + 1].location]
     span.tail = string[range.location + range.length:]
     return wrapper
 
 
 # ---- static vars
 _diacritics = (
-    (u'āáǎăà',    u'a'),
-    (u'ēéěè',     u'e'),
-    (u'ōóǒò',     u'o'),
+    (u'āáǎăà', u'a'),
+    (u'ēéěè', u'e'),
+    (u'ōóǒò', u'o'),
     (u'ūúǔùǖǘǚǜ', u'u'),
-    (u'īíǐì',     u'i')
+    (u'īíǐì', u'i')
 )
 
 
 def lowercase_string_by_removing_pinyin_tones(s):
-    '''lowercase_string_by_removing_pinyin_tones(string) --> unicode
+    """lowercase_string_by_removing_pinyin_tones(string) --> unicode
 
     simplify / plainize chinese pinyin by converting it to lower case and
     removing diacritics from letters 'a', 'e', 'o', 'u', i'.
-    '''
+    """
     s = u(s).lower()
     for diacrs, normal in _diacritics:
         for diacr in diacrs:
@@ -271,12 +273,12 @@ _t4 = u"àèùǜìò"
 
 
 def determine_tone(pinyin):
-    '''determine_tone(string) --> {0..4}
+    """determine_tone(string) --> {0..4}
 
     detect tone of given pinyin word.
     return value:
         int from 0 up to 4, where 0 means that tone undetermined.
-    '''
+    """
     pinyin = u(pinyin)
     for letter in pinyin:
         if letter in _t1:
@@ -301,11 +303,13 @@ del namedtuple
 
 def _slice(self, obj):
     return obj[self.location:self.location + self.length]
+
+
 Range._slice = _slice
 
 
 def ranges_of_pinyin_in_string(s):
-    '''ranges_of_pinyin_in_string(string) --> list<Range>
+    """ranges_of_pinyin_in_string(string) --> list<Range>
 
     !! replacing obsolete ``search_for_pin_yin_in_string``.
 
@@ -317,7 +321,7 @@ def ranges_of_pinyin_in_string(s):
         list of ranges of pinyin,
         where ``Range`` is 2-namedtuple of (location, length).
         list can be empty.
-    '''
+    """
     result = []
 
     # the trick of replacing 'v' is that 'v' does not exists in pinyin,
@@ -349,15 +353,15 @@ def ranges_of_pinyin_in_string(s):
                 #
                 # remember that a pinyin never begins with 'i' or 'u',
                 #   and 'v' already replaced with space before the loop.
-                if char_p + word_len + 1 < plain_s_len and\
-                   plain_s[char_p + word_len] in 'aoeiu':
+                if char_p + word_len + 1 < plain_s_len and \
+                                plain_s[char_p + word_len] in 'aoeiu':
 
                     shorten_word = word[:-1]
 
                     if shorten_word in PINYIN_LIST:
                         word = shorten_word
                         word_len = len(word)
-                    #else:
+                    # else:
                         # then our rollback failed,
                         # there should be an error in pinyin,
                         # but we'll try hard to save the situation.
@@ -386,29 +390,29 @@ def ranges_of_pinyin_in_string(s):
 
 
 def colorize(s):
-    '''colorize(s) --> unicode
+    """colorize(s) --> unicode
 
     !! obsoleted by ``colorize_DOM``.  use that one instead.
-    '''
+    """
     raise NotImplementedError(
         "obsoleted by ``colorize_DOM``.  use that one instead.")
 
 
 def search_for_pin_yin_in_string(s):
-    '''search_for_pin_yin_in_string(s) --> list
+    """search_for_pin_yin_in_string(s) --> list
 
     !! obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.
-    '''
+    """
     raise NotImplementedError(
         "obsoleted by ``ranges_of_pinyin_in_string``.  use that one instead.")
 
 
 def colorize_pin_yin(text, pin_yin_pairs):
-    '''colorize_pin_yin(text, pin_yin_pairs) --> str
+    """colorize_pin_yin(text, pin_yin_pairs) --> str
 
     !! obsoleted by ``colorized_HTML_string_from_string`` and
     ``colorized_HTML_element_from_string``.  use one of those instead.
-    '''
+    """
     raise NotImplementedError(
         "obsoleted by ``colorized_HTML_string_from_string`` and "
         "``colorized_HTML_element_from_string``.  use one of those instead.")

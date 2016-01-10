@@ -64,7 +64,7 @@ class ModuleUnicodeTestCase(unittest.TestCase):
                 self.s = s
 
             def __str__(self):
-                return self.s  # randomn rubbish
+                return self.s  # random rubbish
         self.assertTypeEquals(self.richuni, u(C(self.richstr)))
 
     def testUFromCustom__unicode__(self):
@@ -96,7 +96,7 @@ class ModuleUnicodeTestCase(unittest.TestCase):
         self.assertTypeEquals("14.5", utf(14.5))
 
     def testUtfFromBool(self):
-        self.assertTypeEquals(("False"), utf(False))
+        self.assertTypeEquals("False", utf(False))
 
     def testUtfFromCallable(self):
         def fn():

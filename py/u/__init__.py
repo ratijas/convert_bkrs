@@ -5,7 +5,7 @@ __all__ = ('u', 'utf')
 
 
 def u(s):
-    "convert anything to unicode"
+    """convert anything to unicode"""
     if isinstance(s, unicode):
         return s
     try:
@@ -17,7 +17,7 @@ def u(s):
 
 
 def utf(s):
-    "convert anything to utf-8"
+    """convert anything to utf-8"""
     if isinstance(s, str):
         return s
     if hasattr(s, '__unicode__'):
