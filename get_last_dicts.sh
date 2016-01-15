@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 #globals
 DEST_FOLDER=downloads
