@@ -1,0 +1,91 @@
+@charset "UTF-8";
+@namespace d url(http://www.apple.com/DTDs/DictionaryService-1.0.rng);
+
+d|entry {
+}
+
+body {
+	display: block;
+	padding: 0em 0em 1.0em 0em;
+
+	font-family: arial, sans-serif, KaiTi, simsun, Nsimsun, STKaiti, STSong, arial unicode MS;
+
+	font-size: 10pt;
+	line-height: 1.5em;
+}
+
+h1 {
+	display: block;
+	margin-bottom: 0.5em;
+
+	font-size: 120%;
+	font-weight: normal;
+	line-height: 1em;
+}
+
+h3	{
+	font-size: 100%;
+}
+
+br {
+	display: none;
+}
+
+.c {
+	color: green;
+}
+
+.ex {
+	color: #666;
+}
+
+.i {
+	font-style: italic;
+}
+
+.p {
+	font-style: italic;
+	color: green;
+}
+
+.u {
+	text-decoration: underline;
+}
+
+.ex, .m0, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9 {
+	display: block;
+}
+
+.m1 { margin-left: 0em; }
+.m2 { margin-left: 1em; }
+.m3 { margin-left: 1.5em; }
+.m4 { margin-left: 2em; }
+.m5, .m6, .m7, .m8, .m9 { margin-left: 2.5em; }
+
+.py {
+	display: block;
+	font-size: 10pt;
+	margin-top: -3pt;
+	margin-bottom: 5pt;
+	line-height: 1em;
+}
+
+.copyleft {
+	display: inline-block;
+	font-size: 125%;
+	-webkit-transform: rotateY( 180deg );
+	        transform: rotateY( 180deg );
+}
+
+.img_note {
+	display: block;
+	width: 100%;
+	text-align: center;
+	font-size: 75%;
+	color: #888;
+}
+
+.proper_delim {
+	border-top: 1px dashed gray;
+	margin: 0;
+}
